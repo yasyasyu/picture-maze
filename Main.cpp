@@ -137,7 +137,7 @@ namespace MazeUtillity {
 			{
 				ngBorder[y][x][0] = true;
 			}
-			Print << U"!" << A << U", " << B;
+			//Print << U"!" << A << U", " << B;
 		}
 		else if (A.y == B.y)
 		{
@@ -149,7 +149,7 @@ namespace MazeUtillity {
 			{
 				ngBorder[y][x][1] = true;
 			}
-			Print << U"!" << A << U", " << B;
+			//Print << U"!" << A << U", " << B;
 		}
 		else
 		{
