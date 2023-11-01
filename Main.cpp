@@ -211,64 +211,48 @@ namespace MazeUtillity {
 
 	}
 
-	std::tuple< Array<Array<int32>>, Array<Array<int32>> > MakeSpanningTree(const Grid<bool>& grid)
+	std::tuple< Array<Array<int>>, Array<Array<int>>, DisjointSet<int> > MakeSpanningTree(const Grid<bool>& grid)
 	{
-		int32 vertex = 0;
+		int vertex = grid.size().y * grid.size().x;
 
-		int32 D[] = { 0, 1, 0, -1, 0 };
-		Grid<int32> graph(grid.size().y, grid.size().x);
-		for (int32 i = 0; i < grid.size().y; i++)
+		int D[] = { 0, 1, 0, -1, 0 };
+		Grid<int> graph(grid.size().y, grid.size().x);
+		for (int i = 0; i < grid.size().y; i++)
 		{
-			for (int32 j = 0; j < grid.size().x; j++)
+			for (int j = 0; j < grid.size().x; j++)
 			{
-				graph[i][j] = vertex++;
+				graph[i][j] = i * grid.size().x + j;
 			}
 		}
 
 		// 境界辺
 		Grid< Array<bool>> ngBorder(grid.size().y, grid.size().x, Array<bool>(2));
-		for (int32 i = 0; i < grid.size().y; i++)
+		for (int i = 0; i < grid.size().y; i++)
 		{
 			ngBorder[i][grid.size().x - 1][0] = true;
 		}
-		for (int32 j = 0; j < grid.size().x; j++)
+		for (int j = 0; j < grid.size().x; j++)
 		{
 			ngBorder[grid.size().y - 1][j][1] = true;
 		}
 
 		for (int cnt = 0; cnt < 20; cnt++) setNgBorder(ngBorder);
 
-		{
-			TextWriter writer(U"Debug.txt");
-			if (not writer)
-			{
-				throw Error{ U"Failed to open" };
-			}
-			for (int32 i = 0; i < ngBorder.size().y; i++)
-			{
-				for (int32 j = 0; j < ngBorder.size().x; j++)
-				{
-					writer.write(U"[{}, {}], "_fmt(ngBorder[i][j][0], ngBorder[i][j][1]));
-				}
-				writer.writeln();
-			}
-		}
-
-		Grid<int32> edgeWeight(vertex, vertex, 0);
+		Grid<int> edgeWeight(vertex, vertex, 0);
 		std::priority_queue pq(
-			[&](std::pair<int32, int32> x, std::pair<int32, int32> y)
+			[&](std::pair<int, int> x, std::pair<int, int> y)
 			{ return edgeWeight[x.first][x.second] < edgeWeight[y.first][y.second]; },
-			Array<std::pair<int32, int32>>()
+			Array<std::pair<int, int>>()
 		);
 
-		for (int32 i = 0; i < grid.size().y; i++)
+		for (int i = 0; i < grid.size().y; i++)
 		{
-			for (int32 j = 0; j < grid.size().x; j++)
+			for (int j = 0; j < grid.size().x; j++)
 			{
-				for (int32 d = 0; d < 4; d++)
+				for (int d = 0; d < 4; d++)
 				{
-					int32 di = D[d], dj = D[d + 1];
-					int32 ni = i + di, nj = j + dj;
+					int di = D[d], dj = D[d + 1];
+					int ni = i + di, nj = j + dj;
 
 					if (!(0 <= ni && ni < grid.size().y && 0 <= nj && nj < grid.size().x))
 					{
@@ -276,10 +260,10 @@ namespace MazeUtillity {
 					}
 					if (grid[i][j] == grid[ni][nj])
 					{
-						std::pair<int32, int32> edge(graph[i][j], graph[ni][nj]);
+						std::pair<int, int> edge(graph[i][j], graph[ni][nj]);
 
-						int32 frm = i * grid.size().x + j;
-						int32 to = ni * grid.size().x + nj;
+						int frm = i * grid.size().x + j;
+						int to = ni * grid.size().x + nj;
 						if (frm > to)
 						{
 							std::swap(frm, to);
@@ -298,13 +282,13 @@ namespace MazeUtillity {
 			}
 		}
 
-		DisjointSet<int32> dsu(vertex);
-		Array<Array<int32>> ansSpanningTree(vertex);
-		Array<Array<int32>> spanningTree(vertex);
+		DisjointSet<int> dsu(vertex);
+		Array<Array<int>> ansSpanningTree(vertex);
+		Array<Array<int>> spanningTree(vertex);
 
 		while (!pq.empty())
 		{
-			std::pair<int32, int32> edge = pq.top();
+			std::pair<int, int> edge = pq.top();
 			pq.pop();
 
 			if (dsu.connected(edge.first, edge.second))
@@ -321,7 +305,7 @@ namespace MazeUtillity {
 			}
 		}
 
-		return { ansSpanningTree, spanningTree };
+		return { ansSpanningTree, spanningTree, dsu };
 	}
 
 	void MakeWall(Grid<int>& mazeGrid, int u, int v) {
@@ -433,7 +417,7 @@ namespace MazeUtillity {
 			}
 		}
 
-		auto [ansSpanningTree, spanningTree] = MakeSpanningTree(pictureGrid);
+		auto [ansSpanningTree, spanningTree, dsu] = MakeSpanningTree(pictureGrid);
 
 		for (int u = 0; u < ansSpanningTree.size(); u++)
 		{
@@ -451,6 +435,21 @@ namespace MazeUtillity {
 		}
 
 		// TODO Create wall at not connected-cell in random;
+		int vertex = pictureGrid.size().y * pictureGrid.size().x;
+		Array<Array<int>> connectedElements(vertex);
+		for (int v = 0; v < vertex; v++)
+		{
+			int u = dsu.find(v);
+			connectedElements[u] << v;
+		}
+
+		for (int v = 0; v < vertex; v++)
+		{
+			if (connectedElements[v].size() > 0)
+			{
+				Print << connectedElements[v];
+			}
+		}
 
 		return ansSpanningTree;
 	}
