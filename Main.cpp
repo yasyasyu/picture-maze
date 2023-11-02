@@ -33,7 +33,6 @@ namespace MazeUtillity {
 					for (int32 d = 0; d < 4; d++)
 					{
 						int32 di = D[d], dj = D[d + 1];
-
 						int32 ni = i + di, nj = j + dj;
 
 						if (!(
@@ -43,7 +42,9 @@ namespace MazeUtillity {
 							continue;
 						}
 						if (grid[ni][nj])
+						{
 							dsu.merge(i * grid.size().x + j, ni * grid.size().x + nj);
+						}
 					}
 				}
 			}
@@ -403,11 +404,74 @@ namespace MazeUtillity {
 	/**
 	 * @brief 該当座標の中の4分割したマスのいずれかを袋小路にする。
 	 * @param mazeGrid
-	 * @param cell
+	 * @param dsu
 	*/
-	void MakeWall(Grid<int>& mazeGrid, Point cell)
+	void MakePathWall(Grid<int>& mazeGrid, DisjointSet<int>& dsu)
 	{
+		
+		int vertex = mazeGrid.size().y/2 * mazeGrid.size().x/2;
+		Array<Array<int>> connectedElements(vertex);
 
+		for (int v = 0; v < vertex; v++)
+		{
+			int u = dsu.find(v);
+			connectedElements[u] << v;
+		}
+		for (int u = 0; u < vertex; u++)
+		{
+			if (connectedElements[u].size() > 0)
+			{
+				int rndCell = Random<int>(0, connectedElements[u].size() - 1);
+				int cell = connectedElements[u][rndCell];
+				{
+					int rnd = Random<int>(0, 3);
+					int i = (cell / (mazeGrid.size().x / 2)) * 2, j = (cell % (mazeGrid.size().x / 2)) * 2;
+					int di = rnd / 2, dj = rnd % 2;
+
+					int wall = mazeGrid[i + di][j + dj] ^ 15;
+					int wall_cnt = 0;
+					for (int bit = 0; bit < 4; bit++)
+					{
+						if (((wall >> bit) & 1) == 1)
+						{
+							wall_cnt++;
+						}
+					}
+					int rnd_wall = Random<int>(0, wall_cnt - 1);
+
+					wall_cnt = 0;
+					for (int bit = 0; bit < 4; bit++)
+					{
+						if (((wall >> bit) & 1) == 1)
+						{
+							if (wall_cnt == rnd_wall)
+							{
+								mazeGrid[i + di][j + dj] |= 1 << bit;
+								switch (bit)
+								{
+								case 0:
+									mazeGrid[i + di - 1][j + dj] |= 1 << 2;
+									break;
+								case 1:
+									mazeGrid[i + di][j + dj + 1] |= 1 << 3;
+									break;
+								case 2:
+									mazeGrid[i + di + 1][j + dj] |= 1 << 0;
+									break;
+								case 3:
+									mazeGrid[i + di][j + dj - 1] |= 1 << 1;
+									break;
+								default:
+									break;
+								}
+								break;
+							}
+							wall_cnt++;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -447,21 +511,8 @@ namespace MazeUtillity {
 		}
 
 		// TODO Create wall at not connected-cell in random;
-		int vertex = pictureGrid.size().y * pictureGrid.size().x;
-		Array<Array<int>> connectedElements(vertex);
-		for (int v = 0; v < vertex; v++)
-		{
-			int u = dsu.find(v);
-			connectedElements[u] << v;
-		}
 
-		for (int v = 0; v < vertex; v++)
-		{
-			if (connectedElements[v].size() > 0)
-			{
-				Print << connectedElements[v];
-			}
-		}
+		MakePathWall(mazeGrid, dsu);
 
 		return ansSpanningTree;
 	}
