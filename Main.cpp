@@ -510,9 +510,9 @@ namespace MazeUtillity {
 			}
 		}
 
-		// TODO Create wall at not connected-cell in random;
-
 		MakePathWall(mazeGrid, dsu);
+
+		// TODO joint cell that are not connected to the group.
 
 		return ansSpanningTree;
 	}
