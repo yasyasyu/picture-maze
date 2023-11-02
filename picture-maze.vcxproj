@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{cd99e75f-e724-43b3-88f2-92f6bff8de0e}</ProjectGuid>
+    <ProjectGuid>{9350166a-798d-417b-9770-19eabf0762ba}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>picture_maze</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
