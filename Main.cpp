@@ -324,6 +324,13 @@ namespace MazeUtillity {
 		return { ansSpanningTree, spanningTree };
 	}
 
+
+	/**
+	 * @brief 座標uと座標vを繋げる。
+	 * @param mazeGrid 
+	 * @param u 
+	 * @param v
+	*/
 	void MakeWall(Grid<int>& mazeGrid, int u, int v) {
 		if (u > v) {
 			std::swap(u, v);
@@ -408,13 +415,18 @@ namespace MazeUtillity {
 		}
 	}
 
+
+	/**
+	 * @brief 該当座標の中の4分割したマスのいずれかを袋小路にする。
+	 * @param mazeGrid
+	 * @param cell
+	*/
 	void MakeWall(Grid<int>& mazeGrid, Point cell)
 	{
 
 	}
 
 	/**
-	 * @fn 迷路を作る。
 	 * @brief 描画用グリッドから迷路を作成する。
 	 * @param[in] pictureGrid 絵用のグリッド
 	 * @param[out] mazeGrid 迷路用のグリッド
@@ -576,9 +588,9 @@ public:
 		}
 		return false;
 	}
-	bool returnFlag = false;
 	bool DrawDot(const Input& mouse, Point& previousMousePoint)
 	{
+
 		Point nowPoint = (Cursor::Pos() - FIELD_OFFSET) / (CELL_SIZE * CELL_CNT);
 		if ((mouse.pressed() &&
 			!(
@@ -590,6 +602,7 @@ public:
 			previousMousePoint = Point(-1, -1);
 			return false;
 		}
+		bool returnFlag = false;
 		if (mouse.down() &&
 			(
 				0 <= nowPoint.x && nowPoint.x < FIELD_WIDTH &&
@@ -608,8 +621,10 @@ public:
 					}
 				}
 				pictureGrid[nowPoint] = mouse == MouseL;
+				returnFlag = true;
 			}
 		}
+
 		if (mouse.pressed() &&
 			(
 				0 <= nowPoint.x && nowPoint.x < FIELD_WIDTH &&
@@ -765,6 +780,7 @@ public:
 				}
 			}
 		}
+
 		for (int32 i = 0; i < FIELD_HEIGHT * 2; i++)
 		{
 			int top = i * HARF_CELL_CNT, bottom = (i + 1) * HARF_CELL_CNT - 1;
