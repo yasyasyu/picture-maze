@@ -312,8 +312,8 @@ namespace MazeUtillity {
 
 	/**
 	 * @brief 座標uと座標vを繋げる。
-	 * @param mazeGrid 
-	 * @param u 
+	 * @param mazeGrid
+	 * @param u
 	 * @param v
 	*/
 	void MakeWall(Grid<int>& mazeGrid, int u, int v) {
@@ -408,8 +408,8 @@ namespace MazeUtillity {
 	*/
 	void MakePathWall(Grid<int>& mazeGrid, DisjointSet<int>& dsu)
 	{
-		
-		int vertex = mazeGrid.size().y/2 * mazeGrid.size().x/2;
+
+		int vertex = mazeGrid.size().y / 2 * mazeGrid.size().x / 2;
 		Array<Array<int>> connectedElements(vertex);
 
 		for (int v = 0; v < vertex; v++)
@@ -1002,6 +1002,7 @@ void Main()
 				app.InitBreak();
 				pictureMaze.TextureFill(AppMode::Maze);
 			}
+
 			pictureMaze.PrintSpanningTree(spanningTree);
 
 			//SolveMaze(mazeGrid);
