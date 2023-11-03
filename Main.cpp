@@ -11,11 +11,11 @@ enum class AppMode
 
 namespace MazeUtillity {
 	/**
- * @fn gridのTrueの部分が連結かを判定する。
- * @brief 連結グラフ判定
- * @param[in] (grid) 判定するグラフ
- * @return bool 連結グラフか否か
- */
+	 * @fn gridのTrueの部分が連結かを判定する。
+	 * @brief 連結グラフ判定
+	 * @param[in] (grid) 判定するグラフ
+	 * @return bool 連結グラフか否か
+	 */
 	bool isConnectedGraph(const Grid<bool>& grid)
 	{
 		DisjointSet<int32> dsu(grid.size().y * grid.size().x);
@@ -33,7 +33,6 @@ namespace MazeUtillity {
 					for (int32 d = 0; d < 4; d++)
 					{
 						int32 di = D[d], dj = D[d + 1];
-
 						int32 ni = i + di, nj = j + dj;
 
 						if (!(
@@ -43,7 +42,9 @@ namespace MazeUtillity {
 							continue;
 						}
 						if (grid[ni][nj])
+						{
 							dsu.merge(i * grid.size().x + j, ni * grid.size().x + nj);
+						}
 					}
 				}
 			}
@@ -67,6 +68,7 @@ namespace MazeUtillity {
 		//Print << U"Connected";
 		return true;
 	}
+
 	HashSet<Point> Bresenham(Point previous, Point now)
 	{
 		HashSet<Point> draw;
@@ -137,7 +139,6 @@ namespace MazeUtillity {
 			{
 				ngBorder[y][x][0] = true;
 			}
-			Print << U"!" << A << U", " << B;
 		}
 		else if (A.y == B.y)
 		{
@@ -149,7 +150,6 @@ namespace MazeUtillity {
 			{
 				ngBorder[y][x][1] = true;
 			}
-			Print << U"!" << A << U", " << B;
 		}
 		else
 		{
@@ -211,64 +211,49 @@ namespace MazeUtillity {
 
 	}
 
-	std::tuple< Array<Array<int32>>, Array<Array<int32>> > MakeSpanningTree(const Grid<bool>& grid)
+	std::tuple< Array<Array<int>>, Array<Array<int>>, DisjointSet<int> >
+		MakeSpanningTree(const Grid<bool>& grid)
 	{
-		int32 vertex = 0;
+		int vertex = grid.size().y * grid.size().x;
 
-		int32 D[] = { 0, 1, 0, -1, 0 };
-		Grid<int32> graph(grid.size().y, grid.size().x);
-		for (int32 i = 0; i < grid.size().y; i++)
+		int D[] = { 0, 1, 0, -1, 0 };
+		Grid<int> graph(grid.size().y, grid.size().x);
+		for (int i = 0; i < grid.size().y; i++)
 		{
-			for (int32 j = 0; j < grid.size().x; j++)
+			for (int j = 0; j < grid.size().x; j++)
 			{
-				graph[i][j] = vertex++;
+				graph[i][j] = i * grid.size().x + j;
 			}
 		}
 
 		// 境界辺
 		Grid< Array<bool>> ngBorder(grid.size().y, grid.size().x, Array<bool>(2));
-		for (int32 i = 0; i < grid.size().y; i++)
+		for (int i = 0; i < grid.size().y; i++)
 		{
 			ngBorder[i][grid.size().x - 1][0] = true;
 		}
-		for (int32 j = 0; j < grid.size().x; j++)
+		for (int j = 0; j < grid.size().x; j++)
 		{
 			ngBorder[grid.size().y - 1][j][1] = true;
 		}
 
 		for (int cnt = 0; cnt < 20; cnt++) setNgBorder(ngBorder);
 
-		{
-			TextWriter writer(U"Debug.txt");
-			if (not writer)
-			{
-				throw Error{ U"Failed to open" };
-			}
-			for (int32 i = 0; i < ngBorder.size().y; i++)
-			{
-				for (int32 j = 0; j < ngBorder.size().x; j++)
-				{
-					writer.write(U"[{}, {}], "_fmt(ngBorder[i][j][0], ngBorder[i][j][1]));
-				}
-				writer.writeln();
-			}
-		}
-
-		Grid<int32> edgeWeight(vertex, vertex, 0);
+		Grid<int> edgeWeight(vertex, vertex, 0);
 		std::priority_queue pq(
-			[&](std::pair<int32, int32> x, std::pair<int32, int32> y)
+			[&](std::pair<int, int> x, std::pair<int, int> y)
 			{ return edgeWeight[x.first][x.second] < edgeWeight[y.first][y.second]; },
-			Array<std::pair<int32, int32>>()
+			Array<std::pair<int, int>>()
 		);
 
-		for (int32 i = 0; i < grid.size().y; i++)
+		for (int i = 0; i < grid.size().y; i++)
 		{
-			for (int32 j = 0; j < grid.size().x; j++)
+			for (int j = 0; j < grid.size().x; j++)
 			{
-				for (int32 d = 0; d < 4; d++)
+				for (int d = 0; d < 4; d++)
 				{
-					int32 di = D[d], dj = D[d + 1];
-					int32 ni = i + di, nj = j + dj;
+					int di = D[d], dj = D[d + 1];
+					int ni = i + di, nj = j + dj;
 
 					if (!(0 <= ni && ni < grid.size().y && 0 <= nj && nj < grid.size().x))
 					{
@@ -276,10 +261,10 @@ namespace MazeUtillity {
 					}
 					if (grid[i][j] == grid[ni][nj])
 					{
-						std::pair<int32, int32> edge(graph[i][j], graph[ni][nj]);
+						std::pair<int, int> edge(graph[i][j], graph[ni][nj]);
 
-						int32 frm = i * grid.size().x + j;
-						int32 to = ni * grid.size().x + nj;
+						int frm = i * grid.size().x + j;
+						int to = ni * grid.size().x + nj;
 						if (frm > to)
 						{
 							std::swap(frm, to);
@@ -298,13 +283,13 @@ namespace MazeUtillity {
 			}
 		}
 
-		DisjointSet<int32> dsu(vertex);
-		Array<Array<int32>> ansSpanningTree(vertex);
-		Array<Array<int32>> spanningTree(vertex);
+		DisjointSet<int> dsu(vertex);
+		Array<Array<int>> ansSpanningTree(vertex);
+		Array<Array<int>> spanningTree(vertex);
 
 		while (!pq.empty())
 		{
-			std::pair<int32, int32> edge = pq.top();
+			std::pair<int, int> edge = pq.top();
 			pq.pop();
 
 			if (dsu.connected(edge.first, edge.second))
@@ -321,14 +306,13 @@ namespace MazeUtillity {
 			}
 		}
 
-		return { ansSpanningTree, spanningTree };
+		return { ansSpanningTree, spanningTree, dsu };
 	}
-
 
 	/**
 	 * @brief 座標uと座標vを繋げる。
-	 * @param mazeGrid 
-	 * @param u 
+	 * @param mazeGrid
+	 * @param u
 	 * @param v
 	*/
 	void MakeWall(Grid<int>& mazeGrid, int u, int v) {
@@ -340,90 +324,182 @@ namespace MazeUtillity {
 			int li = (u / (mazeGrid.size().x / 2)) * 2, lj = (u % (mazeGrid.size().x / 2)) * 2;
 			int ri = (v / (mazeGrid.size().x / 2)) * 2, rj = (v % (mazeGrid.size().x / 2)) * 2;
 
-			/*
-				#*|##
-				##|##
-			*/
-			mazeGrid[li + 0][lj + 1] &= 13;
-			mazeGrid[li + 0][lj + 1] |= 4;
+			for (int di = 0; di < 2; di++)
+			{
+				mazeGrid[li + di][lj + 1] &= 15 - (1 << 1);
+				mazeGrid[li + di][lj + 1] |= 1 << (2 - 2*di);
 
-			/*
-				##|##
-				#*|##
-			*/
-			mazeGrid[li + 1][lj + 1] &= 13;
-			mazeGrid[li + 1][lj + 1] |= 1;
-
-			/*
-				##|*#
-				##|##
-			*/
-			mazeGrid[ri + 0][rj + 0] &= 7;
-			mazeGrid[ri + 0][rj + 0] |= 4;
-
-			/*
-				##|##
-				##|*#
-			*/
-			mazeGrid[ri + 1][rj + 0] &= 7;
-			mazeGrid[ri + 1][rj + 0] |= 1;
+				mazeGrid[ri + di][rj + 0] &= 15 - (1 << 3);
+				mazeGrid[ri + di][rj + 0] |= 1 << (2 - 2*di);
+			}
 		}
 		else
 		{
 			int ti = (u / (mazeGrid.size().x / 2)) * 2, tj = (u % (mazeGrid.size().x / 2)) * 2;
 			int bi = (v / (mazeGrid.size().x / 2)) * 2, bj = (v % (mazeGrid.size().x / 2)) * 2;
 
-			/*
-				##
-				*#
-				--
-				##
-				##
-			*/
-			mazeGrid[ti + 1][tj + 0] &= 11;
-			mazeGrid[ti + 1][tj + 0] |= 2;
+			for (int dj = 0; dj < 2; dj++)
+			{
+				mazeGrid[ti + 1][tj + dj] &= 15 - (1 << 2);
+				mazeGrid[ti + 1][tj + dj] |= 1 << (1 + 2 * dj);
 
-			/*
-				##
-				#*
-				--
-				##
-				##
-			*/
-			mazeGrid[ti + 1][tj + 1] &= 11;
-			mazeGrid[ti + 1][tj + 1] |= 8;
-
-			/*
-				##
-				##
-				--
-				*#
-				##
-			*/
-			mazeGrid[bi + 0][bj + 0] &= 14;
-			mazeGrid[bi + 0][bj + 0] |= 2;
-
-			/*
-				##
-				##
-				--
-				#*
-				##
-			*/
-			mazeGrid[bi + 0][bj + 1] &= 14;
-			mazeGrid[bi + 0][bj + 1] |= 8;
+				mazeGrid[bi + 0][bj + dj] &= 15 - (1 << 0);
+				mazeGrid[bi + 0][bj + dj] |= 1 << (1 + 2 * dj);
+			}
 		}
 	}
 
+	void JointCell(Grid<int>& mazeGrid, int u, int v)
+	{
+		if (u > v)
+		{
+			std::swap(u, v);
+		}
+
+		if (abs(v - u) == 1)
+		{
+			int li = u / mazeGrid.size().x, lj = u % mazeGrid.size().x;
+			int ri = v / mazeGrid.size().x, rj = v % mazeGrid.size().x;
+
+			mazeGrid[li][lj] &= 15 - (1 << 1);
+			mazeGrid[ri][rj] &= 15 - (1 << 3);
+		}
+		else
+		{
+			int ti = u / mazeGrid.size().x, tj = u % mazeGrid.size().x;
+			int bi = v / mazeGrid.size().x, bj = v % mazeGrid.size().x;
+
+			mazeGrid[ti][tj] &= 15 - (1 << 2);
+			mazeGrid[bi][bj] &= 15 - (1 << 0);
+		}
+	}
 
 	/**
 	 * @brief 該当座標の中の4分割したマスのいずれかを袋小路にする。
 	 * @param mazeGrid
-	 * @param cell
+	 * @param dsu
 	*/
-	void MakeWall(Grid<int>& mazeGrid, Point cell)
+	void MakePathWall(Grid<int>& mazeGrid, DisjointSet<int>& dsu)
 	{
 
+		int vertex = mazeGrid.size().y / 2 * mazeGrid.size().x / 2;
+		Array<Array<int>> connectedElements(vertex);
+
+		for (int v = 0; v < vertex; v++)
+		{
+			int u = dsu.find(v);
+			connectedElements[u] << v;
+		}
+		for (int u = 0; u < vertex; u++)
+		{
+			if (connectedElements[u].size() > 0)
+			{
+				int rndCell = Random<int>(0, connectedElements[u].size() - 1);
+				int cell = connectedElements[u][rndCell];
+				{
+					int rnd = Random<int>(0, 3);
+					int i = (cell / (mazeGrid.size().x / 2)) * 2, j = (cell % (mazeGrid.size().x / 2)) * 2;
+					int di = rnd / 2, dj = rnd % 2;
+
+					int wall = mazeGrid[i + di][j + dj] ^ 15;
+					int wall_cnt = 0;
+					for (int bit = 0; bit < 4; bit++)
+					{
+						if (((wall >> bit) & 1) == 1)
+						{
+							wall_cnt++;
+						}
+					}
+					int rnd_wall = Random<int>(0, wall_cnt - 1);
+
+					wall_cnt = 0;
+					for (int bit = 0; bit < 4; bit++)
+					{
+						if (((wall >> bit) & 1) == 1)
+						{
+							if (wall_cnt == rnd_wall)
+							{
+								mazeGrid[i + di][j + dj] |= 1 << bit;
+
+								// i := bit % 2 == 0
+								// j := bit % 2 == 1
+								// bit + 1
+								// + := 10, 11
+								// - := 01, 00
+								int ddi = ((((bit + 1) >> 1) & 1) == 1 ? 1 : -1) * (bit % 2 == 0 ? 1 : 0);
+								int ddj = ((((bit + 1) >> 1) & 1) == 1 ? 1 : -1) * (bit % 2 == 1 ? 1 : 0);
+
+								mazeGrid[i + di + ddi][j + dj + ddj] |= 1 << ((bit + 2) % 4);
+
+								break;
+							}
+							wall_cnt++;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void JointSpanningTree(Grid<int>& mazeGrid, DisjointSet<int>& dsu)
+	{
+		int D[] = { 0, 1, 0, -1, 0 };
+
+		int vertex = mazeGrid.size().y * mazeGrid.size().x;
+		Grid<int> edgeWeight(vertex, vertex, 0);
+		std::priority_queue pq(
+			[&](std::pair<int, int> x, std::pair<int, int> y)
+			{ return edgeWeight[x.first][x.second] < edgeWeight[y.first][y.second]; },
+			Array<std::pair<int, int>>()
+		);
+
+		for (int i = 0; i < mazeGrid.size().y; i++)
+		{
+			for (int j = 0; j < mazeGrid.size().x; j++)
+			{
+				for (int d = 0; d < 4; d++)
+				{
+					int di = D[d], dj = D[d + 1];
+					int ni = i + di, nj = j + dj;
+
+					int _frm = i / 2 * mazeGrid.size().x / 2 + j / 2;
+					int _to = ni / 2 * mazeGrid.size().x / 2 + nj / 2;
+
+					if (!(0 <= ni && ni < mazeGrid.size().y && 0 <= nj && nj < mazeGrid.size().x))
+					{
+						continue;
+					}
+
+					// 接続していない集団同士であるとき
+					if (dsu.find(_frm) != dsu.find(_to))
+					{
+						int frm = i * mazeGrid.size().x + j;
+						int to = ni * mazeGrid.size().x + nj;
+
+						edgeWeight[frm][to] = (int)(Random() * 10000);
+						pq.push(std::pair<int, int>(frm, to));
+					}
+				}
+			}
+		}
+		while (!pq.empty())
+		{
+			std::pair<int, int> edge = pq.top();
+			pq.pop();
+			int fi = edge.first / mazeGrid.size().x, fj = edge.first % mazeGrid.size().x;
+			int ni = edge.second / mazeGrid.size().x, nj = edge.second % mazeGrid.size().x;
+
+			int frm = fi / 2 * mazeGrid.size().x / 2 + fj / 2;
+			int to = ni / 2 * mazeGrid.size().x / 2 + nj / 2;
+			
+			if (dsu.connected(frm, to))
+			{
+				continue;
+			}
+
+			dsu.merge(frm, to);
+			JointCell(mazeGrid, edge.first, edge.second);
+		}
 	}
 
 	/**
@@ -445,7 +521,7 @@ namespace MazeUtillity {
 			}
 		}
 
-		auto [ansSpanningTree, spanningTree] = MakeSpanningTree(pictureGrid);
+		auto [ansSpanningTree, spanningTree, dsu] = MakeSpanningTree(pictureGrid);
 
 		for (int u = 0; u < ansSpanningTree.size(); u++)
 		{
@@ -462,8 +538,10 @@ namespace MazeUtillity {
 			}
 		}
 
-		// TODO Create wall at not connected-cell in random;
+		MakePathWall(mazeGrid, dsu);
 
+		// TODO joint cell that are not connected to the group.
+		JointSpanningTree(mazeGrid, dsu);
 		return ansSpanningTree;
 	}
 }
@@ -481,8 +559,10 @@ private:
 	int FIELD_OFFSET_LEFT = CELL_SIZE / 2;
 	int FIELD_OFFSET_UP = 50;
 
-	Point FIELD_OFFSET = Point(FIELD_OFFSET_LEFT + CELL_SIZE % 2,
-								FIELD_OFFSET_UP + CELL_SIZE % 2);
+	Point FIELD_OFFSET = Point(
+		FIELD_OFFSET_LEFT + CELL_SIZE % 2,
+		FIELD_OFFSET_UP   + CELL_SIZE % 2
+	);
 
 	int FIELD_OFFSET_RIGHT = 200;
 	int FIELD_OFFSET_DOWN = CELL_SIZE / 2;
@@ -492,6 +572,8 @@ private:
 	Image pictureImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
 	Image mazeImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
 	DynamicTexture texture = DynamicTexture(pictureImage);
+
+	bool spanningTreeView = false;
 
 public:
 	Grid<bool> pictureGrid = Grid<bool>(FIELD_WIDTH, FIELD_HEIGHT, false);
@@ -575,6 +657,7 @@ public:
 			//Print << U"Solve Maze";
 		}
 	}
+
 	bool ReMaze()
 	{
 		if (SimpleGUI::Button(U"ReMaze",
@@ -588,6 +671,7 @@ public:
 		}
 		return false;
 	}
+
 	bool DrawDot(const Input& mouse, Point& previousMousePoint)
 	{
 
@@ -680,7 +764,6 @@ public:
 			120))
 		{
 			pictureImage.saveWithDialog();
-
 		}
 	}
 
@@ -704,6 +787,20 @@ public:
 			}
 			TextureFill(AppMode::Paint);
 		}
+	}
+
+	bool PrintSpanningTreeButton()
+	{
+		if (SimpleGUI::Button(U"PrintSpanningTree",
+			Vec2{ FIELD_OFFSET_LEFT + 240,
+				std::max(5, FIELD_OFFSET_UP / 2 - BUTTON_HEIGHT / 2)
+			},
+			180))
+		{
+			spanningTreeView = !spanningTreeView;
+		}
+
+		return spanningTreeView;
 	}
 
 	/**
@@ -854,8 +951,6 @@ public:
 			}, 120)
 			&& MazeUtillity::isConnectedGraph(pictureGrid);
 	}
-
-
 };
 
 class Application
@@ -869,6 +964,7 @@ public:
 	{
 		return applicationMode;
 	}
+
 	void ModeChange()
 	{
 		_init = true;
@@ -888,6 +984,7 @@ public:
 	bool init() const {
 		return _init;
 	}
+
 	void InitBreak()
 	{
 		_init = false;
@@ -952,7 +1049,10 @@ void Main()
 				app.InitBreak();
 				pictureMaze.TextureFill(AppMode::Maze);
 			}
-			pictureMaze.PrintSpanningTree(spanningTree);
+			if (pictureMaze.PrintSpanningTreeButton())
+			{
+				pictureMaze.PrintSpanningTree(spanningTree);
+			}
 
 			//SolveMaze(mazeGrid);
 			if (pictureMaze.ReturnPaint())

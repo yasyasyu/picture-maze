@@ -362,5 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-/Intermediate/picture_maze/Debug/Intermediate
-/App
+*.exe
+App/Debug.txt

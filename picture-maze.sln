@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.7.34202.233
+VisualStudioVersion = 17.7.34003.232
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "picture-maze", "picture-maze.vcxproj", "{9350166A-798D-417B-9770-19EABF0762BA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "picture-maze", "picture-maze.vcxproj", "{B41F7757-50F5-4F34-A412-F0C271A42FC7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9350166A-798D-417B-9770-19EABF0762BA}.Debug|x64.ActiveCfg = Debug|x64
-		{9350166A-798D-417B-9770-19EABF0762BA}.Debug|x64.Build.0 = Debug|x64
-		{9350166A-798D-417B-9770-19EABF0762BA}.Release|x64.ActiveCfg = Release|x64
-		{9350166A-798D-417B-9770-19EABF0762BA}.Release|x64.Build.0 = Release|x64
+		{B41F7757-50F5-4F34-A412-F0C271A42FC7}.Debug|x64.ActiveCfg = Debug|x64
+		{B41F7757-50F5-4F34-A412-F0C271A42FC7}.Debug|x64.Build.0 = Debug|x64
+		{B41F7757-50F5-4F34-A412-F0C271A42FC7}.Release|x64.ActiveCfg = Release|x64
+		{B41F7757-50F5-4F34-A412-F0C271A42FC7}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C613E2EA-2B77-4551-B396-A23563450E9A}
+		SolutionGuid = {F0C7B851-A21D-4D6F-9B81-7E5FC0A5BDE4}
 	EndGlobalSection
 EndGlobal
