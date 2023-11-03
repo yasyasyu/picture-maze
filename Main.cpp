@@ -447,23 +447,17 @@ namespace MazeUtillity {
 							if (wall_cnt == rnd_wall)
 							{
 								mazeGrid[i + di][j + dj] |= 1 << bit;
-								switch (bit)
-								{
-								case 0:
-									mazeGrid[i + di - 1][j + dj] |= 1 << 2;
-									break;
-								case 1:
-									mazeGrid[i + di][j + dj + 1] |= 1 << 3;
-									break;
-								case 2:
-									mazeGrid[i + di + 1][j + dj] |= 1 << 0;
-									break;
-								case 3:
-									mazeGrid[i + di][j + dj - 1] |= 1 << 1;
-									break;
-								default:
-									break;
-								}
+
+								// i := bit % 2 == 0
+								// j := bit % 2 == 1
+								// bit + 1
+								// + := 10, 11
+								// - := 01, 00
+								int ddi = ((((bit + 1) >> 1) & 1) == 1 ? 1 : -1) * (bit % 2 == 0 ? 1 : 0);
+								int ddj = ((((bit + 1) >> 1) & 1) == 1 ? 1 : -1) * (bit % 2 == 1 ? 1 : 0);
+
+								mazeGrid[i + di + ddi][j + dj + ddj] |= 1 << ((bit + 2) % 4);
+
 								break;
 							}
 							wall_cnt++;
@@ -471,6 +465,76 @@ namespace MazeUtillity {
 					}
 				}
 			}
+		}
+	}
+
+	void JointSpanningTree(Grid<int>& mazeGrid, DisjointSet<int>& dsu)
+	{
+		int D[] = { 0, 1, 0, -1, 0 };
+		Grid<int> graph(mazeGrid.size().y, mazeGrid.size().x);
+		for (int i = 0; i < mazeGrid.size().y; i++)
+		{
+			for (int j = 0; j < mazeGrid.size().x; j++)
+			{
+				graph[i][j] = i * mazeGrid.size().x + j;
+			}
+		}
+
+		int vertex = mazeGrid.size().y * mazeGrid.size().x;
+		Grid<int> edgeWeight(vertex, vertex, 0);
+		std::priority_queue pq(
+			[&](std::pair<int, int> x, std::pair<int, int> y)
+			{ return edgeWeight[x.first][x.second] < edgeWeight[y.first][y.second]; },
+			Array<std::pair<int, int>>()
+		);
+
+		for (int i = 0; i < mazeGrid.size().y; i++)
+		{
+			for (int j = 0; j < mazeGrid.size().x; j++)
+			{
+				for (int d = 0; d < 4; d++)
+				{
+					int di = D[d], dj = D[d + 1];
+					int ni = i + di, nj = j + dj;
+
+					int _frm = i / 2 * mazeGrid.size().x / 2 + j / 2;
+					int _to = ni / 2 * mazeGrid.size().x / 2 + nj / 2;
+
+					if (!(0 <= ni && ni < mazeGrid.size().y && 0 <= nj && nj < mazeGrid.size().x))
+					{
+						continue;
+					}
+
+
+
+					// 接続していない集団同士であるとき
+					if (dsu.find(_frm) != dsu.find(_to))
+					{
+						std::pair<int, int> edge(graph[i][j], graph[ni][nj]);
+						edgeWeight[edge.first][edge.second] = (int)(Random() * 10000);
+						pq.push(edge);
+						Print << graph[i][j] << U":" << graph[ni][nj];
+					}
+					else
+					{
+						std::pair<int, int> edge(graph[i][j], graph[ni][nj]);
+						edgeWeight[edge.first][edge.second] = -1;
+					}
+				}
+			}
+		}
+		TextWriter writer(U"Debug.txt");
+		if (not writer)
+		{
+			throw Error{ U"Failed to open" };
+		}
+		for (int i = 0; i < edgeWeight.size().y; i++)
+		{
+			for (int j = 0; j < edgeWeight.size().x; j++)
+			{
+				writer.write(U"|{}|"_fmt(edgeWeight[i][j]));
+			}
+			writer.writeln();
 		}
 	}
 
@@ -513,7 +577,7 @@ namespace MazeUtillity {
 		MakePathWall(mazeGrid, dsu);
 
 		// TODO joint cell that are not connected to the group.
-
+		JointSpanningTree(mazeGrid, dsu);
 		return ansSpanningTree;
 	}
 }
@@ -1002,7 +1066,6 @@ void Main()
 				app.InitBreak();
 				pictureMaze.TextureFill(AppMode::Maze);
 			}
-
 			pictureMaze.PrintSpanningTree(spanningTree);
 
 			//SolveMaze(mazeGrid);
