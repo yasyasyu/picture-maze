@@ -138,7 +138,6 @@ namespace MazeUtillity {
 			{
 				ngBorder[y][x][0] = true;
 			}
-			//Print << U"!" << A << U", " << B;
 		}
 		else if (A.y == B.y)
 		{
@@ -150,7 +149,6 @@ namespace MazeUtillity {
 			{
 				ngBorder[y][x][1] = true;
 			}
-			//Print << U"!" << A << U", " << B;
 		}
 		else
 		{
@@ -400,6 +398,30 @@ namespace MazeUtillity {
 		}
 	}
 
+	void JointCell(Grid<int>& mazeGrid, int u, int v)
+	{
+		if (u > v)
+		{
+			std::swap(u, v);
+		}
+
+		if (abs(v - u) == 1)
+		{
+			int li = u / mazeGrid.size().x, lj = u % mazeGrid.size().x;
+			int ri = v / mazeGrid.size().x, rj = v % mazeGrid.size().x;
+
+			mazeGrid[li][lj] &= 15 - (1 << 1);
+			mazeGrid[ri][rj] &= 15 - (1 << 3);
+		}
+		else
+		{
+			int ti = u / mazeGrid.size().x, tj = u % mazeGrid.size().x;
+			int bi = v / mazeGrid.size().x, bj = v % mazeGrid.size().x;
+
+			mazeGrid[ti][tj] &= 15 - (1 << 2);
+			mazeGrid[bi][bj] &= 15 - (1 << 0);
+		}
+	}
 
 	/**
 	 * @brief 該当座標の中の4分割したマスのいずれかを袋小路にする。
@@ -471,14 +493,6 @@ namespace MazeUtillity {
 	void JointSpanningTree(Grid<int>& mazeGrid, DisjointSet<int>& dsu)
 	{
 		int D[] = { 0, 1, 0, -1, 0 };
-		Grid<int> graph(mazeGrid.size().y, mazeGrid.size().x);
-		for (int i = 0; i < mazeGrid.size().y; i++)
-		{
-			for (int j = 0; j < mazeGrid.size().x; j++)
-			{
-				graph[i][j] = i * mazeGrid.size().x + j;
-			}
-		}
 
 		int vertex = mazeGrid.size().y * mazeGrid.size().x;
 		Grid<int> edgeWeight(vertex, vertex, 0);
@@ -505,36 +519,35 @@ namespace MazeUtillity {
 						continue;
 					}
 
-
-
 					// 接続していない集団同士であるとき
 					if (dsu.find(_frm) != dsu.find(_to))
 					{
-						std::pair<int, int> edge(graph[i][j], graph[ni][nj]);
-						edgeWeight[edge.first][edge.second] = (int)(Random() * 10000);
-						pq.push(edge);
-						Print << graph[i][j] << U":" << graph[ni][nj];
-					}
-					else
-					{
-						std::pair<int, int> edge(graph[i][j], graph[ni][nj]);
-						edgeWeight[edge.first][edge.second] = -1;
+						int frm = i * mazeGrid.size().x + j;
+						int to = ni * mazeGrid.size().x + nj;
+
+						edgeWeight[frm][to] = (int)(Random() * 10000);
+						pq.push(std::pair<int, int>(frm, to));
 					}
 				}
 			}
 		}
-		TextWriter writer(U"Debug.txt");
-		if (not writer)
+		while (!pq.empty())
 		{
-			throw Error{ U"Failed to open" };
-		}
-		for (int i = 0; i < edgeWeight.size().y; i++)
-		{
-			for (int j = 0; j < edgeWeight.size().x; j++)
+			std::pair<int, int> edge = pq.top();
+			pq.pop();
+			int fi = edge.first / mazeGrid.size().x, fj = edge.first % mazeGrid.size().x;
+			int ni = edge.second / mazeGrid.size().x, nj = edge.second % mazeGrid.size().x;
+
+			int frm = fi / 2 * mazeGrid.size().x / 2 + fj / 2;
+			int to = ni / 2 * mazeGrid.size().x / 2 + nj / 2;
+			
+			if (dsu.connected(frm, to))
 			{
-				writer.write(U"|{}|"_fmt(edgeWeight[i][j]));
+				continue;
 			}
-			writer.writeln();
+
+			dsu.merge(frm, to);
+			JointCell(mazeGrid, edge.first, edge.second);
 		}
 	}
 
