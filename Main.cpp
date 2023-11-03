@@ -11,11 +11,11 @@ enum class AppMode
 
 namespace MazeUtillity {
 	/**
- * @fn gridのTrueの部分が連結かを判定する。
- * @brief 連結グラフ判定
- * @param[in] (grid) 判定するグラフ
- * @return bool 連結グラフか否か
- */
+	 * @fn gridのTrueの部分が連結かを判定する。
+	 * @brief 連結グラフ判定
+	 * @param[in] (grid) 判定するグラフ
+	 * @return bool 連結グラフか否か
+	 */
 	bool isConnectedGraph(const Grid<bool>& grid)
 	{
 		DisjointSet<int32> dsu(grid.size().y * grid.size().x);
@@ -68,6 +68,7 @@ namespace MazeUtillity {
 		//Print << U"Connected";
 		return true;
 	}
+
 	HashSet<Point> Bresenham(Point previous, Point now)
 	{
 		HashSet<Point> draw;
@@ -210,7 +211,8 @@ namespace MazeUtillity {
 
 	}
 
-	std::tuple< Array<Array<int>>, Array<Array<int>>, DisjointSet<int> > MakeSpanningTree(const Grid<bool>& grid)
+	std::tuple< Array<Array<int>>, Array<Array<int>>, DisjointSet<int> >
+		MakeSpanningTree(const Grid<bool>& grid)
 	{
 		int vertex = grid.size().y * grid.size().x;
 
@@ -307,7 +309,6 @@ namespace MazeUtillity {
 		return { ansSpanningTree, spanningTree, dsu };
 	}
 
-
 	/**
 	 * @brief 座標uと座標vを繋げる。
 	 * @param mazeGrid
@@ -323,78 +324,28 @@ namespace MazeUtillity {
 			int li = (u / (mazeGrid.size().x / 2)) * 2, lj = (u % (mazeGrid.size().x / 2)) * 2;
 			int ri = (v / (mazeGrid.size().x / 2)) * 2, rj = (v % (mazeGrid.size().x / 2)) * 2;
 
-			/*
-				#*|##
-				##|##
-			*/
-			mazeGrid[li + 0][lj + 1] &= 13;
-			mazeGrid[li + 0][lj + 1] |= 4;
+			for (int di = 0; di < 2; di++)
+			{
+				mazeGrid[li + di][lj + 1] &= 15 - (1 << 1);
+				mazeGrid[li + di][lj + 1] |= 1 << (2 - 2*di);
 
-			/*
-				##|##
-				#*|##
-			*/
-			mazeGrid[li + 1][lj + 1] &= 13;
-			mazeGrid[li + 1][lj + 1] |= 1;
-
-			/*
-				##|*#
-				##|##
-			*/
-			mazeGrid[ri + 0][rj + 0] &= 7;
-			mazeGrid[ri + 0][rj + 0] |= 4;
-
-			/*
-				##|##
-				##|*#
-			*/
-			mazeGrid[ri + 1][rj + 0] &= 7;
-			mazeGrid[ri + 1][rj + 0] |= 1;
+				mazeGrid[ri + di][rj + 0] &= 15 - (1 << 3);
+				mazeGrid[ri + di][rj + 0] |= 1 << (2 - 2*di);
+			}
 		}
 		else
 		{
 			int ti = (u / (mazeGrid.size().x / 2)) * 2, tj = (u % (mazeGrid.size().x / 2)) * 2;
 			int bi = (v / (mazeGrid.size().x / 2)) * 2, bj = (v % (mazeGrid.size().x / 2)) * 2;
 
-			/*
-				##
-				*#
-				--
-				##
-				##
-			*/
-			mazeGrid[ti + 1][tj + 0] &= 11;
-			mazeGrid[ti + 1][tj + 0] |= 2;
+			for (int dj = 0; dj < 2; dj++)
+			{
+				mazeGrid[ti + 1][tj + dj] &= 15 - (1 << 2);
+				mazeGrid[ti + 1][tj + dj] |= 1 << (1 + 2 * dj);
 
-			/*
-				##
-				#*
-				--
-				##
-				##
-			*/
-			mazeGrid[ti + 1][tj + 1] &= 11;
-			mazeGrid[ti + 1][tj + 1] |= 8;
-
-			/*
-				##
-				##
-				--
-				*#
-				##
-			*/
-			mazeGrid[bi + 0][bj + 0] &= 14;
-			mazeGrid[bi + 0][bj + 0] |= 2;
-
-			/*
-				##
-				##
-				--
-				#*
-				##
-			*/
-			mazeGrid[bi + 0][bj + 1] &= 14;
-			mazeGrid[bi + 0][bj + 1] |= 8;
+				mazeGrid[bi + 0][bj + dj] &= 15 - (1 << 0);
+				mazeGrid[bi + 0][bj + dj] |= 1 << (1 + 2 * dj);
+			}
 		}
 	}
 
@@ -608,8 +559,10 @@ private:
 	int FIELD_OFFSET_LEFT = CELL_SIZE / 2;
 	int FIELD_OFFSET_UP = 50;
 
-	Point FIELD_OFFSET = Point(FIELD_OFFSET_LEFT + CELL_SIZE % 2,
-								FIELD_OFFSET_UP + CELL_SIZE % 2);
+	Point FIELD_OFFSET = Point(
+		FIELD_OFFSET_LEFT + CELL_SIZE % 2,
+		FIELD_OFFSET_UP   + CELL_SIZE % 2
+	);
 
 	int FIELD_OFFSET_RIGHT = 200;
 	int FIELD_OFFSET_DOWN = CELL_SIZE / 2;
@@ -619,6 +572,8 @@ private:
 	Image pictureImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
 	Image mazeImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
 	DynamicTexture texture = DynamicTexture(pictureImage);
+
+	bool spanningTreeView = false;
 
 public:
 	Grid<bool> pictureGrid = Grid<bool>(FIELD_WIDTH, FIELD_HEIGHT, false);
@@ -702,6 +657,7 @@ public:
 			//Print << U"Solve Maze";
 		}
 	}
+
 	bool ReMaze()
 	{
 		if (SimpleGUI::Button(U"ReMaze",
@@ -715,6 +671,7 @@ public:
 		}
 		return false;
 	}
+
 	bool DrawDot(const Input& mouse, Point& previousMousePoint)
 	{
 
@@ -807,7 +764,6 @@ public:
 			120))
 		{
 			pictureImage.saveWithDialog();
-
 		}
 	}
 
@@ -831,6 +787,20 @@ public:
 			}
 			TextureFill(AppMode::Paint);
 		}
+	}
+
+	bool PrintSpanningTreeButton()
+	{
+		if (SimpleGUI::Button(U"PrintSpanningTree",
+			Vec2{ FIELD_OFFSET_LEFT + 240,
+				std::max(5, FIELD_OFFSET_UP / 2 - BUTTON_HEIGHT / 2)
+			},
+			180))
+		{
+			spanningTreeView = !spanningTreeView;
+		}
+
+		return spanningTreeView;
 	}
 
 	/**
@@ -981,8 +951,6 @@ public:
 			}, 120)
 			&& MazeUtillity::isConnectedGraph(pictureGrid);
 	}
-
-
 };
 
 class Application
@@ -996,6 +964,7 @@ public:
 	{
 		return applicationMode;
 	}
+
 	void ModeChange()
 	{
 		_init = true;
@@ -1015,6 +984,7 @@ public:
 	bool init() const {
 		return _init;
 	}
+
 	void InitBreak()
 	{
 		_init = false;
@@ -1079,7 +1049,10 @@ void Main()
 				app.InitBreak();
 				pictureMaze.TextureFill(AppMode::Maze);
 			}
-			pictureMaze.PrintSpanningTree(spanningTree);
+			if (pictureMaze.PrintSpanningTreeButton())
+			{
+				pictureMaze.PrintSpanningTree(spanningTree);
+			}
 
 			//SolveMaze(mazeGrid);
 			if (pictureMaze.ReturnPaint())
