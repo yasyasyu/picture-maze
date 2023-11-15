@@ -379,11 +379,15 @@ namespace MazeUtillity {
 	 * @param mazeGrid
 	 * @param dsu
 	*/
-	void MakePathWall(Grid<int>& mazeGrid, DisjointSet<int>& dsu)
+	std::tuple<Point, Point>
+		MakePathWall(Grid<int>& mazeGrid, DisjointSet<int>& dsu)
 	{
 
 		int vertex = mazeGrid.size().y / 2 * mazeGrid.size().x / 2;
 		Array<Array<int>> connectedElements(vertex);
+
+		Point start;
+		Point goal;
 
 		for (int v = 0; v < vertex; v++)
 		{
@@ -399,6 +403,7 @@ namespace MazeUtillity {
 				{
 					int rnd = Random<int>(0, 3);
 					int i = (cell / (mazeGrid.size().x / 2)) * 2, j = (cell % (mazeGrid.size().x / 2)) * 2;
+
 					int di = rnd / 2, dj = rnd % 2;
 
 					int wall = mazeGrid[i + di][j + dj] ^ 15;
@@ -431,6 +436,9 @@ namespace MazeUtillity {
 
 								mazeGrid[i + di + ddi][j + dj + ddj] |= 1 << ((bit + 2) % 4);
 
+								start = Point(i + di, j + dj);
+								goal = Point(i + di + ddi, j + dj +ddj);
+
 								break;
 							}
 							wall_cnt++;
@@ -439,9 +447,12 @@ namespace MazeUtillity {
 				}
 			}
 		}
+
+		return {start, goal};
 	}
 
-	void JointSpanningTree(Grid<int>& mazeGrid, DisjointSet<int>& dsu)
+	void JointSpanningTree(
+		Grid<int>& mazeGrid, DisjointSet<int>& dsu, const Grid<bool>& pictureGrid)
 	{
 		int D[] = { 0, 1, 0, -1, 0 };
 
@@ -498,6 +509,7 @@ namespace MazeUtillity {
 			}
 
 			dsu.merge(frm, to);
+
 			JointCell(mazeGrid, edge.first, edge.second);
 		}
 	}
@@ -508,7 +520,8 @@ namespace MazeUtillity {
 	 * @param[out] mazeGrid 迷路用のグリッド
 	 * @return Array<Array<int32>> 全域木
 	 */
-	Array<Array<int32>> CreateMaze(const Grid<bool>& pictureGrid, Grid<int>& mazeGrid)
+	std::tuple<Array<Array<int32>>, Array<Array<int32>>, Point, Point>
+		CreateMaze(const Grid<bool>& pictureGrid, Grid<int>& mazeGrid)
 	{
 		for (int i = 0; i < pictureGrid.size().y; i++)
 		{
@@ -538,11 +551,44 @@ namespace MazeUtillity {
 			}
 		}
 
-		MakePathWall(mazeGrid, dsu);
+		auto [start, goal] = MakePathWall(mazeGrid, dsu);
 
-		// TODO joint cell that are not connected to the group.
-		JointSpanningTree(mazeGrid, dsu);
-		return ansSpanningTree;
+		JointSpanningTree(mazeGrid, dsu, pictureGrid);
+
+		return
+		{
+			ansSpanningTree, spanningTree, start, goal
+		};
+	}
+
+	void Solve(Grid<int>& mazeGrid, Point start, Point goal)
+	{
+		Array<Point> stack;
+		stack << start;
+		Grid<int> dist(mazeGrid.size(), 0);
+		int32 D[] = { 0, 1, 0, -1, 0 };
+
+		while (stack) {
+			Point frm = stack.back();
+			stack.pop_back();
+			int pos = mazeGrid[frm];
+			Print << pos;
+			for (int d = 0; d < 4; d++)
+			{
+				//int dy = D[d], dx = D[d + 1];
+
+				//if (
+				//	!(
+				//		0 <= frm.x + dx && frm.x + dx < mazeGrid.size().x &&
+				//		0 <= frm.y + dy && frm.y + dy < mazeGrid.size().y
+				//	))
+				//{
+				//	continue;
+				//}
+
+			}
+		}
+
 	}
 }
 
@@ -574,6 +620,8 @@ private:
 	DynamicTexture texture = DynamicTexture(pictureImage);
 
 	bool spanningTreeView = false;
+
+	Point start, goal;
 
 public:
 	Grid<bool> pictureGrid = Grid<bool>(FIELD_WIDTH, FIELD_HEIGHT, false);
@@ -610,6 +658,11 @@ public:
 		{
 			RectF(p * CELL_CNT, CELL_CNT).overwriteFrame(pictureImage, 1, 1, WALL_COLOR);
 		}
+	}
+
+	void SetStartGoal(Point _start, Point _goal) {
+		this->start = _start;
+		this->goal = _goal;
 	}
 
 	/**
@@ -654,6 +707,8 @@ public:
 				std::max(5, FIELD_OFFSET_UP / 2 - BUTTON_HEIGHT / 2)
 			}, 120))
 		{
+
+			MazeUtillity::Solve(mazeGrid, Point(0, 0), Point(1, 1));
 			//Print << U"Solve Maze";
 		}
 	}
@@ -808,7 +863,7 @@ public:
 	 * @brief 全域木を迷路上に表示する。
 	 * @param[in] (spanningTree) 全域木
 	 */
-	void PrintSpanningTree(Array<Array<int32>> spanningTree)
+	void PrintSpanningTree(Array<Array<int32>> spanningTree, Color color)
 	{
 		const ScopedRenderStates2D sampler{ SamplerState::ClampNearest };
 		for (int frm = 0; frm < spanningTree.size(); frm++)
@@ -836,7 +891,7 @@ public:
 							std::abs(_frm % FIELD_WIDTH - _to % FIELD_WIDTH),
 							std::abs(_frm / FIELD_WIDTH - _to / FIELD_WIDTH))
 						) * CELL_SIZE + FIELD_OFFSET
-				).draw(3, Palette::Red);
+				).draw(3, color);
 
 				Line(
 					(
@@ -855,7 +910,7 @@ public:
 							_to / FIELD_WIDTH
 						) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2)
 						) * CELL_SIZE + FIELD_OFFSET
-				).draw(3, Palette::Red);
+				).draw(3, color);
 			}
 		}
 	}
@@ -1007,6 +1062,7 @@ void Main()
 
 	pictureMaze.ResetCanvas();
 	Array<Array<int32>> spanningTree;
+	Array<Array<int32>> outSpanningTree;
 	Point previousMousePoint = Point(-1, -1);
 	while (System::Update())
 	{
@@ -1044,17 +1100,22 @@ void Main()
 			// 迷路モード
 			if (app.init() || pictureMaze.ReMaze())
 			{
-				spanningTree = MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid);
+				auto [_ansSpanningTree, _spanningTree, start, goal]
+					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid);
+				spanningTree = _ansSpanningTree;
+				outSpanningTree = _spanningTree;
+				pictureMaze.SetStartGoal(start, goal);
 				pictureMaze.DrawMaze();
 				app.InitBreak();
 				pictureMaze.TextureFill(AppMode::Maze);
 			}
 			if (pictureMaze.PrintSpanningTreeButton())
 			{
-				pictureMaze.PrintSpanningTree(spanningTree);
+				pictureMaze.PrintSpanningTree(spanningTree, Palette::Red);
+				pictureMaze.PrintSpanningTree(outSpanningTree, Palette::Blue);
 			}
 
-			//SolveMaze(mazeGrid);
+			pictureMaze.SolveMaze();
 			if (pictureMaze.ReturnPaint())
 			{
 				app.ModeChange();
