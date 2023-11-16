@@ -117,17 +117,20 @@ namespace MazeUtillity {
 
 	void setNgBorder(Grid< Array<bool>>& ngBorder)
 	{
-		Point A = Point(
-			Random<int32>(0, ngBorder.size().x - 1),
-			Random<int32>(0, ngBorder.size().y - 1)
-		);
+		Point A;
 		Point B;
 		do {
-			B = Point(
+			A = Point(
 				Random<int32>(0, ngBorder.size().x - 1),
 				Random<int32>(0, ngBorder.size().y - 1)
 			);
-		} while (A == B);
+			do {
+				B = Point(
+					Random<int32>(0, ngBorder.size().x - 1),
+					Random<int32>(0, ngBorder.size().y - 1)
+				);
+			} while (A == B);
+		} while ((A.x != B.x && A.y != B.y) || (A.x - B.x)* (A.x - B.x) + (A.y - B.y)* (A.y - B.y) < 150);
 
 		if (A.x == B.x)
 		{
@@ -151,6 +154,7 @@ namespace MazeUtillity {
 				ngBorder[y][x][1] = true;
 			}
 		}
+		/*
 		else
 		{
 			//Print << A << U", " << B;
@@ -208,10 +212,10 @@ namespace MazeUtillity {
 				}
 			} while (!used.contains(B));
 		}
-
+		*/
 	}
 
-	std::tuple< Array<Array<int>>, Array<Array<int>>, DisjointSet<int> >
+	std::tuple< Array<Array<int>>, Array<Array<int>>, DisjointSet<int>, int>
 		MakeSpanningTree(const Grid<bool>& grid)
 	{
 		int vertex = grid.size().y * grid.size().x;
@@ -286,7 +290,7 @@ namespace MazeUtillity {
 		DisjointSet<int> dsu(vertex);
 		Array<Array<int>> ansSpanningTree(vertex);
 		Array<Array<int>> spanningTree(vertex);
-
+		int ansDelegate;
 		while (!pq.empty())
 		{
 			std::pair<int, int> edge = pq.top();
@@ -299,6 +303,7 @@ namespace MazeUtillity {
 			if (grid[edge.first / grid.size().x][edge.first % grid.size().x])
 			{
 				ansSpanningTree[edge.first] << edge.second;
+				ansDelegate = edge.first;
 			}
 			else
 			{
@@ -306,7 +311,7 @@ namespace MazeUtillity {
 			}
 		}
 
-		return { ansSpanningTree, spanningTree, dsu };
+		return { ansSpanningTree, spanningTree, dsu, dsu.find(ansDelegate)};
 	}
 
 	/**
@@ -380,7 +385,7 @@ namespace MazeUtillity {
 	 * @param dsu
 	*/
 	std::tuple<Point, Point>
-		MakePathWall(Grid<int>& mazeGrid, DisjointSet<int>& dsu)
+		MakePathWall(Grid<int>& mazeGrid, DisjointSet<int>& dsu, int ans)
 	{
 
 		int vertex = mazeGrid.size().y / 2 * mazeGrid.size().x / 2;
@@ -388,7 +393,7 @@ namespace MazeUtillity {
 
 		Point start;
 		Point goal;
-
+		int ansLeader = dsu.find(ans);
 		for (int v = 0; v < vertex; v++)
 		{
 			int u = dsu.find(v);
@@ -436,8 +441,12 @@ namespace MazeUtillity {
 
 								mazeGrid[i + di + ddi][j + dj + ddj] |= 1 << ((bit + 2) % 4);
 
-								start = Point(i + di, j + dj);
-								goal = Point(i + di + ddi, j + dj +ddj);
+								if (u == ansLeader)
+								{
+									start = Point(j + dj, i + di);
+									goal = Point(j + dj + ddj, i + di + ddi);
+									Print << start << goal;
+								}
 
 								break;
 							}
@@ -533,8 +542,8 @@ namespace MazeUtillity {
 				mazeGrid[i * 2 + 1][j * 2 + 1] = 6;
 			}
 		}
-
-		auto [ansSpanningTree, spanningTree, dsu] = MakeSpanningTree(pictureGrid);
+		
+		auto [ansSpanningTree, spanningTree, dsu, ans] = MakeSpanningTree(pictureGrid);
 
 		for (int u = 0; u < ansSpanningTree.size(); u++)
 		{
@@ -551,7 +560,7 @@ namespace MazeUtillity {
 			}
 		}
 
-		auto [start, goal] = MakePathWall(mazeGrid, dsu);
+		auto [start, goal] = MakePathWall(mazeGrid, dsu, ans);
 
 		JointSpanningTree(mazeGrid, dsu, pictureGrid);
 
@@ -561,34 +570,88 @@ namespace MazeUtillity {
 		};
 	}
 
-	void Solve(Grid<int>& mazeGrid, Point start, Point goal)
+	Array<Point> Solve(Grid<int>& mazeGrid, Point start, Point goal)
 	{
 		Array<Point> stack;
 		stack << start;
-		Grid<int> dist(mazeGrid.size(), 0);
-		int32 D[] = { 0, 1, 0, -1, 0 };
+		int32 INF = mazeGrid.size().x * mazeGrid.size().y + 10;
+		Grid<int> dist(mazeGrid.size(), INF);
+		Array <std::pair<int, int>> D = {
+			{ 0,  -1},
+			{ 1,  0},
+			{ 0,  1},
+			{-1,  0}
+		};
+
+		dist[start] = 0;
+		while (stack) {
+			Point frm = stack.back();
+			stack.pop_back();
+			int posWall = mazeGrid[frm];
+
+			for (int d = 0; d < 4; d++)
+			{
+
+				if (((posWall >> d) & 1) == 1)	continue;
+
+				int dx = D[d].first, dy = D[d].second;
+				if (
+					!(
+						0 <= frm.x + dx && frm.x + dx < mazeGrid.size().x &&
+						0 <= frm.y + dy && frm.y + dy < mazeGrid.size().y
+					))
+				{
+					continue;
+				}
+
+				Point to = Point(frm.x + dx, frm.y + dy);
+
+				if (dist[to] < dist[frm] + 1)	continue;
+
+				dist[to] = std::min(dist[to], dist[frm] + 1);
+				if (to == goal)
+				{
+					stack.clear();
+					break;
+				}
+				stack << to;
+			}
+		}
+		stack.clear();
+		stack << goal;
+		Array<Point> route{goal};
 
 		while (stack) {
 			Point frm = stack.back();
 			stack.pop_back();
-			int pos = mazeGrid[frm];
-			Print << pos;
 			for (int d = 0; d < 4; d++)
 			{
-				//int dy = D[d], dx = D[d + 1];
 
-				//if (
-				//	!(
-				//		0 <= frm.x + dx && frm.x + dx < mazeGrid.size().x &&
-				//		0 <= frm.y + dy && frm.y + dy < mazeGrid.size().y
-				//	))
-				//{
-				//	continue;
-				//}
+				int dx = D[d].first, dy = D[d].second;
+				if (
+					!(
+						0 <= frm.x + dx && frm.x + dx < mazeGrid.size().x &&
+						0 <= frm.y + dy && frm.y + dy < mazeGrid.size().y
+						))
+				{
+					continue;
+				}
 
+				Point to = Point(frm.x + dx, frm.y + dy);
+
+				if (dist[to] != dist[frm] - 1)	continue;
+
+				route << to;
+				if (dist[to] == 0)
+				{
+					stack.clear();
+					break;
+				}
+				stack << to;
 			}
 		}
 
+		return route;
 	}
 }
 
@@ -703,12 +766,12 @@ public:
 	{
 		if (SimpleGUI::Button(U"SolveMaze",
 			Vec2{
-				FIELD_OFFSET_LEFT + 120 + 120 + 20 + 20,
-				std::max(5, FIELD_OFFSET_UP / 2 - BUTTON_HEIGHT / 2)
+				FIELD_OFFSET_LEFT + 120 + 120 + 20 + 20 + 220,
+				std::max(5, FIELD_OFFSET_UP / 2 - BUTTON_HEIGHT / 2) * 2 + 40
 			}, 120))
 		{
 
-			MazeUtillity::Solve(mazeGrid, Point(0, 0), Point(1, 1));
+			Array<Point> ans = MazeUtillity::Solve(mazeGrid, start, goal);
 			//Print << U"Solve Maze";
 		}
 	}
