@@ -31,8 +31,8 @@ private:
 
 	bool spanningTreeView = false;
 
-	Point start, goal;
-	Array<Point> ansRoute;
+	Point start = Point(0, 0), goal = Point(0, 0);
+	Array<Point> ansRoute = {};
 
 	void SetRoute(const Array<Point>& route);
 
