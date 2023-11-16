@@ -1,8 +1,16 @@
 ﻿# include <Siv3D.hpp> // OpenSiv3D v0.6.10
 constexpr Color PALETTE[] = {
-	Palette::White, Palette::Black, Palette::Red
+	Palette::White,
+	Palette::Black,
+	Palette::Red,
+	Palette::Green,
+	Palette::Blue,
+	Palette::Orange,
+	Palette::Hotpink,
+	Palette::Gray
 };
-constexpr Color WALL_COLOR = Palette::Gray;
+constexpr Color WALL_COLOR = PALETTE[7];
+
 enum class AppMode
 {
 	Paint,
@@ -52,7 +60,7 @@ namespace MazeUtillity {
 
 		if (f)
 		{
-			//Print << U"Not Painted";
+
 			return false;
 		}
 		int32 first = exist[0];
@@ -60,12 +68,11 @@ namespace MazeUtillity {
 		{
 			if (!dsu.connected(first, p))
 			{
-				//Print << U"Not Connected";
+
 				return false;
 			}
 		}
 
-		//Print << U"Connected";
 		return true;
 	}
 
@@ -130,7 +137,7 @@ namespace MazeUtillity {
 					Random<int32>(0, ngBorder.size().y - 1)
 				);
 			} while (A == B);
-		} while ((A.x != B.x && A.y != B.y) || (A.x - B.x)* (A.x - B.x) + (A.y - B.y)* (A.y - B.y) < 150);
+		} while ((A.x - B.x)* (A.x - B.x) + (A.y - B.y)* (A.y - B.y) < 150);
 
 		if (A.x == B.x)
 		{
@@ -154,10 +161,8 @@ namespace MazeUtillity {
 				ngBorder[y][x][1] = true;
 			}
 		}
-		/*
 		else
 		{
-			//Print << A << U", " << B;
 			HashSet<Point> borders = Bresenham(A, B);
 			HashSet<Point> used;
 			std::queue<Point> que;
@@ -212,7 +217,6 @@ namespace MazeUtillity {
 				}
 			} while (!used.contains(B));
 		}
-		*/
 	}
 
 	std::tuple< Array<Array<int>>, Array<Array<int>>, DisjointSet<int>, int>
@@ -290,7 +294,7 @@ namespace MazeUtillity {
 		DisjointSet<int> dsu(vertex);
 		Array<Array<int>> ansSpanningTree(vertex);
 		Array<Array<int>> spanningTree(vertex);
-		int ansDelegate;
+		int ansDelegate = 0;
 		while (!pq.empty())
 		{
 			std::pair<int, int> edge = pq.top();
@@ -445,7 +449,6 @@ namespace MazeUtillity {
 								{
 									start = Point(j + dj, i + di);
 									goal = Point(j + dj + ddj, i + di + ddi);
-									Print << start << goal;
 								}
 
 								break;
@@ -574,7 +577,7 @@ namespace MazeUtillity {
 	{
 		Array<Point> stack;
 		stack << start;
-		int32 INF = mazeGrid.size().x * mazeGrid.size().y + 10;
+		int32 INF = mazeGrid.size().x * mazeGrid.size().y + 100;
 		Grid<int> dist(mazeGrid.size(), INF);
 		Array <std::pair<int, int>> D = {
 			{ 0,  -1},
@@ -617,15 +620,16 @@ namespace MazeUtillity {
 				stack << to;
 			}
 		}
-		stack.clear();
+
 		stack << goal;
 		Array<Point> route{goal};
-
 		while (stack) {
 			Point frm = stack.back();
 			stack.pop_back();
+			int posWall = mazeGrid[frm];
 			for (int d = 0; d < 4; d++)
 			{
+				if (((posWall >> d) & 1) == 1)	continue;
 
 				int dx = D[d].first, dy = D[d].second;
 				if (
@@ -642,7 +646,7 @@ namespace MazeUtillity {
 				if (dist[to] != dist[frm] - 1)	continue;
 
 				route << to;
-				if (dist[to] == 0)
+				if (to == start)
 				{
 					stack.clear();
 					break;
@@ -650,7 +654,7 @@ namespace MazeUtillity {
 				stack << to;
 			}
 		}
-
+		route.reverse();
 		return route;
 	}
 }
@@ -685,6 +689,19 @@ private:
 	bool spanningTreeView = false;
 
 	Point start, goal;
+	Array<Point> ansRoute;
+	void SetRoute(const Array<Point>& route)
+	{
+		isRoute = true;
+		this->ansRoute = route;
+	}
+	bool isRoute = false;
+
+
+	int index = 0;
+	int count = 0;
+	int visualizeFrame = 20;
+	int overCount = 0;
 
 public:
 	Grid<bool> pictureGrid = Grid<bool>(FIELD_WIDTH, FIELD_HEIGHT, false);
@@ -757,6 +774,8 @@ public:
 				}
 			}
 
+			this->isRoute = false;
+
 			return true;
 		}
 		return false;
@@ -770,9 +789,8 @@ public:
 				std::max(5, FIELD_OFFSET_UP / 2 - BUTTON_HEIGHT / 2) * 2 + 40
 			}, 120))
 		{
-
-			Array<Point> ans = MazeUtillity::Solve(mazeGrid, start, goal);
-			//Print << U"Solve Maze";
+			Array<Point>route = MazeUtillity::Solve(mazeGrid, start, goal);
+			SetRoute(route);
 		}
 	}
 
@@ -784,7 +802,6 @@ public:
 				std::max(5, FIELD_OFFSET_UP / 2 - BUTTON_HEIGHT / 2)
 			}, 120))
 		{
-			//Print << U"ReCreate Maze";
 			return true;
 		}
 		return false;
@@ -792,7 +809,6 @@ public:
 
 	bool DrawDot(const Input& mouse, Point& previousMousePoint)
 	{
-
 		Point nowPoint = (Cursor::Pos() - FIELD_OFFSET) / (CELL_SIZE * CELL_CNT);
 		if ((mouse.pressed() &&
 			!(
@@ -980,6 +996,7 @@ public:
 
 	void DrawMaze()
 	{
+		this->isRoute = false;
 		for (int32 i = 0; i < FIELD_HEIGHT * 2; i++)
 		{
 			int top = i * HARF_CELL_CNT, bottom = (i + 1) * HARF_CELL_CNT - 1;
@@ -1054,7 +1071,74 @@ public:
 			}
 		}
 	}
+	void DrawRouteDot(const Point& drawPoint)
+	{
+		Color paintColor = PALETTE[2];
 
+		for (int32 i = drawPoint.y * HARF_CELL_CNT + 1; i < (drawPoint.y + 1) * HARF_CELL_CNT - 1; i++)
+		{
+			for (int32 j = drawPoint.x * HARF_CELL_CNT + 1; j < (drawPoint.x + 1) * HARF_CELL_CNT - 1; j++)
+			{
+
+				mazeImage[i][j] = paintColor;
+			}
+		}
+	}
+	void DrawRouteBetweenDot(const Point& drawPointFrom, const Point& drawPointTo)
+	{
+		Color paintColor = PALETTE[2];
+		int si = std::min(drawPointFrom.y, drawPointTo.y), gi = std::max(drawPointFrom.y, drawPointTo.y);
+		int sj = std::min(drawPointFrom.x, drawPointTo.x), gj = std::max(drawPointFrom.x, drawPointTo.x);
+		for (int32 i = si*HARF_CELL_CNT + 1; i < (gi + 1)*HARF_CELL_CNT - 1; i++)
+		{
+			for (int32 j = sj*HARF_CELL_CNT + 1; j < (gj + 1) * HARF_CELL_CNT - 1; j++)
+			{
+				mazeImage[i][j] = paintColor;
+			}
+		}
+	}
+
+	void VisualizeRoute()
+	{
+		if (!this->isRoute)
+		{
+			this->index = 0;
+			this->count = 0;
+			return;
+		};
+		// update
+		this->count++;
+		if (this->count > this->visualizeFrame)
+		{
+			this->count = 0;
+			this->index++;
+
+			if (this->index > this->ansRoute.size())
+			{
+				if (this->overCount < 10)
+				{
+					this->index = this->ansRoute.size();
+					this->overCount++;
+				}
+				else {
+					this->index = 0;
+					this->overCount = 0;
+					DrawMaze();
+					this->isRoute = true;
+				}
+			}
+		}
+
+		//draw
+		for (int i = 0; i < this->index; i++)
+		{
+			if (i == 0) 
+				DrawRouteDot(ansRoute[i]);
+			else
+				DrawRouteBetweenDot(ansRoute[i - 1], ansRoute[i]);
+		}
+		TextureFill(AppMode::Maze);
+	}
 	/**
 	 * @fn 迷路モードにする。
 	 * @param[in] pictureGrid 連結グラフ判定用グリッド
@@ -1174,11 +1258,12 @@ void Main()
 			}
 			if (pictureMaze.PrintSpanningTreeButton())
 			{
-				pictureMaze.PrintSpanningTree(spanningTree, Palette::Red);
-				pictureMaze.PrintSpanningTree(outSpanningTree, Palette::Blue);
+				pictureMaze.PrintSpanningTree(spanningTree, PALETTE[3]);
+				pictureMaze.PrintSpanningTree(outSpanningTree, PALETTE[5]);
 			}
 
 			pictureMaze.SolveMaze();
+			pictureMaze.VisualizeRoute();
 			if (pictureMaze.ReturnPaint())
 			{
 				app.ModeChange();
