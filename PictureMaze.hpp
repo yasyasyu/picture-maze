@@ -27,6 +27,8 @@ private:
 	int BUTTON_LEFT_PADDING = 30;
 	int BUTTON_PADDING = 20;
 
+
+
 	Image pictureImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
 	Image mazeImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
 	DynamicTexture texture = DynamicTexture(pictureImage);
@@ -46,11 +48,16 @@ private:
 	int visualizeFrame = 20;
 	int overCount = 0;
 
+	int visualSpanningTreeFlag = 0;
+
 public:
 	Grid<bool> pictureGrid = Grid<bool>(FIELD_WIDTH, FIELD_HEIGHT, false);
 	Grid<int> mazeGrid = Grid<int>(FIELD_WIDTH * 2, FIELD_HEIGHT * 2, 0);
 
 	Point WindowSize() const;
+
+	Color ansSpanningColor = PALETTE[3];
+	Color outAnsSpanningColor = PALETTE[5];
 
 	void TextureScaled();
 
@@ -92,6 +99,8 @@ public:
 	void DrawRouteDot(const Point& drawPoint);
 
 	void DrawRouteBetweenDot(const Point& drawPointFrom, const Point& drawPointTo);
+
+	void VisualizeFrameSpeedSlider();
 
 	void VisualizeRoute();
 

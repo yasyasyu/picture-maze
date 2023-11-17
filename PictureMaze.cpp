@@ -100,7 +100,7 @@ bool PictureMaze::ReMaze()
 	if (SimpleGUI::Button(U"ReMaze",
 		Vec2{
 			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
-			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 3
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 5
 		}, 120))
 	{
 		return true;
@@ -195,7 +195,7 @@ void PictureMaze::SaveImage()
 	if (SimpleGUI::Button(U"SaveImage",
 		Vec2{
 			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
-			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING)*5
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 7
 		},
 		120))
 	{
@@ -236,10 +236,11 @@ bool PictureMaze::PrintSpanningTreeButton()
 		},
 		180))
 	{
-		spanningTreeView = !spanningTreeView;
+		this->visualSpanningTreeFlag--;
+		if (this->visualSpanningTreeFlag < 0) this->visualSpanningTreeFlag = 3;
 	}
 
-	return spanningTreeView;
+	return this->visualSpanningTreeFlag > 0;
 }
 
 /**
@@ -249,6 +250,11 @@ bool PictureMaze::PrintSpanningTreeButton()
 	*/
 void PictureMaze::PrintSpanningTree(Array<Array<int32>> spanningTree, Color color)
 {
+	if (
+		(this->visualSpanningTreeFlag & 2) == 0 && color == this->ansSpanningColor ||
+		(this->visualSpanningTreeFlag & 1) == 0 && color == this->outAnsSpanningColor
+	)	return;
+
 	const ScopedRenderStates2D sampler{ SamplerState::ClampNearest };
 	for (int frm = 0; frm < spanningTree.size(); frm++)
 	{
@@ -402,6 +408,20 @@ void PictureMaze::DrawRouteBetweenDot(const Point& drawPointFrom, const Point& d
 		{
 			mazeImage[i][j] = paintColor;
 		}
+	}
+}
+
+void PictureMaze::VisualizeFrameSpeedSlider()
+{
+	double changeFrame = 10 - this->visualizeFrame;
+	if (SimpleGUI::Slider(U"{}"_fmt(changeFrame), changeFrame, 1, 10,
+		Vec2{
+			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 3
+		},
+		25, 100))
+	{
+		visualizeFrame = 10 - changeFrame;
 	}
 }
 
