@@ -474,10 +474,21 @@ void PictureMaze::VisualizeRoute()
 	*/
 bool PictureMaze::ChangeMazeMode()
 {
-	return SimpleGUI::Button(U"CreateMaze",
+	if (SimpleGUI::Button(U"CreateMaze",
 		Vec2{
 			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
 			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 0
 		}, 120)
-		&& MazeUtillity::isConnectedGraph(pictureGrid);
+	)
+	{
+		if (!MazeUtillity::isConnectedGraph(pictureGrid))
+		{
+			System::MessageBoxOK(U"UnConnectedError", U"絵が全て繋がっていません。", MessageBoxStyle::Warning);
+			return false;
+		}
+
+		return true;
+	}
+
+	return false;
 }
