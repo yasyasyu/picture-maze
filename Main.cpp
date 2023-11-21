@@ -20,6 +20,7 @@ void Main()
 	Array<Array<int32>> spanningTree;
 	Array<Array<int32>> outSpanningTree;
 	Point previousMousePoint = Point(-1, -1);
+
 	while (System::Update())
 	{
 		pictureMaze.TextureScaled();
@@ -57,13 +58,14 @@ void Main()
 			if (app.init() || pictureMaze.ReMaze())
 			{
 				auto [_ansSpanningTree, _spanningTree, start, goal]
-					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid);
+					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid, pictureMaze.seed);
 				spanningTree = _ansSpanningTree;
 				outSpanningTree = _spanningTree;
 				pictureMaze.SetStartGoal(start, goal);
 				pictureMaze.DrawMaze();
 				app.InitBreak();
 				pictureMaze.TextureFill(AppMode::Maze);
+				pictureMaze.MazeTerminate();
 			}
 			if (pictureMaze.PrintSpanningTreeButton())
 			{
@@ -84,5 +86,7 @@ void Main()
 			break;
 		}
 		pictureMaze.SaveImage();
+		pictureMaze.RandomCheckBox();
+		pictureMaze.SeedInputBox(app.mode() == AppMode::Paint);
 	}
 }
