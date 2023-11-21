@@ -67,12 +67,13 @@ void Main()
 			}
 			if (pictureMaze.PrintSpanningTreeButton())
 			{
-				pictureMaze.PrintSpanningTree(spanningTree, PALETTE[3]);
-				pictureMaze.PrintSpanningTree(outSpanningTree, PALETTE[5]);
+				pictureMaze.PrintSpanningTree(spanningTree, pictureMaze.ansSpanningColor);
+				pictureMaze.PrintSpanningTree(outSpanningTree, pictureMaze.outAnsSpanningColor);
 			}
 
 			pictureMaze.SolveMaze();
 			pictureMaze.VisualizeRoute();
+			pictureMaze.VisualizeFrameSpeedSlider();
 			if (pictureMaze.ReturnPaint())
 			{
 				app.ModeChange();

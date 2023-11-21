@@ -7,8 +7,10 @@ void PictureMaze::SetRoute(const Array<Point>& route)
 }
 	
 Point PictureMaze::WindowSize() const {
-	return Point(CELL_SIZE * FIELD_WIDTH * CELL_CNT + FIELD_OFFSET_LEFT + FIELD_OFFSET_RIGHT,
-					CELL_SIZE * FIELD_HEIGHT * CELL_CNT + FIELD_OFFSET_UP + FIELD_OFFSET_DOWN);
+	return Point(
+		CELL_SIZE * FIELD_WIDTH  * CELL_CNT + FIELD_OFFSET_LEFT + FIELD_OFFSET_RIGHT,
+		CELL_SIZE * FIELD_HEIGHT * CELL_CNT + FIELD_OFFSET_UP   + FIELD_OFFSET_DOWN
+	);
 }
 
 void PictureMaze::TextureScaled()
@@ -54,8 +56,8 @@ bool PictureMaze::ReturnPaint()
 {
 	if (SimpleGUI::Button(U"ReturnPaint",
 		Vec2{
-			FIELD_OFFSET_LEFT + 120,
-			std::max(5, FIELD_OFFSET_UP / 2 - BUTTON_HEIGHT / 2)
+			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 0
 		}, 120))
 	{
 		for (int32 y = 0; y < FIELD_HEIGHT; y++)
@@ -84,8 +86,8 @@ void PictureMaze::SolveMaze()
 {
 	if (SimpleGUI::Button(U"SolveMaze",
 		Vec2{
-			FIELD_OFFSET_LEFT + 120 + 120 + 20 + 20 + 220,
-			std::max(5, FIELD_OFFSET_UP / 2 - BUTTON_HEIGHT / 2) * 2 + 40
+			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 2
 		}, 120))
 	{
 		Array<Point>route = MazeUtillity::Solve(mazeGrid, start, goal);
@@ -97,8 +99,8 @@ bool PictureMaze::ReMaze()
 {
 	if (SimpleGUI::Button(U"ReMaze",
 		Vec2{
-			FIELD_OFFSET_LEFT + 120 + 120 + 120 + 20 + 20 + 20,
-			std::max(5, FIELD_OFFSET_UP / 2 - BUTTON_HEIGHT / 2)
+			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 5
 		}, 120))
 	{
 		return true;
@@ -191,8 +193,9 @@ bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint)
 void PictureMaze::SaveImage()
 {
 	if (SimpleGUI::Button(U"SaveImage",
-		Vec2{ FIELD_OFFSET_LEFT,
-			std::max(5, FIELD_OFFSET_UP / 2 - BUTTON_HEIGHT / 2)
+		Vec2{
+			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 7
 		},
 		120))
 	{
@@ -203,9 +206,11 @@ void PictureMaze::SaveImage()
 void PictureMaze::ResetCanvas()
 {
 	if (SimpleGUI::Button(U"ResetCanvas",
-		Vec2{ FIELD_OFFSET_LEFT + 120,
-			std::max(5, FIELD_OFFSET_UP / 2 - BUTTON_HEIGHT / 2)
-		}, 160))
+		Vec2{
+			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 1
+		},
+		120))
 	{
 		for (const auto& p : step({ FIELD_WIDTH, FIELD_HEIGHT }))
 		{
@@ -225,15 +230,17 @@ void PictureMaze::ResetCanvas()
 bool PictureMaze::PrintSpanningTreeButton()
 {
 	if (SimpleGUI::Button(U"PrintSpanningTree",
-		Vec2{ FIELD_OFFSET_LEFT + 240,
-			std::max(5, FIELD_OFFSET_UP / 2 - BUTTON_HEIGHT / 2)
+		Vec2{
+			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 1
 		},
 		180))
 	{
-		spanningTreeView = !spanningTreeView;
+		this->visualSpanningTreeFlag--;
+		if (this->visualSpanningTreeFlag < 0) this->visualSpanningTreeFlag = 3;
 	}
 
-	return spanningTreeView;
+	return this->visualSpanningTreeFlag > 0;
 }
 
 /**
@@ -243,6 +250,11 @@ bool PictureMaze::PrintSpanningTreeButton()
 	*/
 void PictureMaze::PrintSpanningTree(Array<Array<int32>> spanningTree, Color color)
 {
+	if (
+		(this->visualSpanningTreeFlag & 2) == 0 && color == this->ansSpanningColor ||
+		(this->visualSpanningTreeFlag & 1) == 0 && color == this->outAnsSpanningColor
+	)	return;
+
 	const ScopedRenderStates2D sampler{ SamplerState::ClampNearest };
 	for (int frm = 0; frm < spanningTree.size(); frm++)
 	{
@@ -399,6 +411,20 @@ void PictureMaze::DrawRouteBetweenDot(const Point& drawPointFrom, const Point& d
 	}
 }
 
+void PictureMaze::VisualizeFrameSpeedSlider()
+{
+	double changeFrame = 10 - this->visualizeFrame;
+	if (SimpleGUI::Slider(U"{}"_fmt(changeFrame), changeFrame, 1, 10,
+		Vec2{
+			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 3
+		},
+		25, 100))
+	{
+		visualizeFrame = 10 - changeFrame;
+	}
+}
+
 void PictureMaze::VisualizeRoute()
 {
 	if (!this->isRoute)
@@ -450,8 +476,8 @@ bool PictureMaze::ChangeMazeMode()
 {
 	return SimpleGUI::Button(U"CreateMaze",
 		Vec2{
-			FIELD_OFFSET_LEFT + 120 + 120 + 20 + 20,
-			std::max(5, FIELD_OFFSET_UP / 2 - BUTTON_HEIGHT / 2)
+			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 0
 		}, 120)
 		&& MazeUtillity::isConnectedGraph(pictureGrid);
 }

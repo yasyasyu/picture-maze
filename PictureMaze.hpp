@@ -12,18 +12,22 @@ private:
 	int FIELD_HEIGHT = 20;
 	int FIELD_WIDTH = 20;
 
-	int FIELD_OFFSET_LEFT = CELL_SIZE / 2;
-	int FIELD_OFFSET_UP = 50;
+	int FIELD_OFFSET_LEFT = 8;
+	int FIELD_OFFSET_UP = 8;
 
 	Point FIELD_OFFSET = Point(
-		FIELD_OFFSET_LEFT + CELL_SIZE % 2,
-		FIELD_OFFSET_UP + CELL_SIZE % 2
+		FIELD_OFFSET_LEFT,
+		FIELD_OFFSET_UP
 	);
 
 	int FIELD_OFFSET_RIGHT = 200;
-	int FIELD_OFFSET_DOWN = CELL_SIZE / 2;
+	int FIELD_OFFSET_DOWN = 8;
 
-	int BUTTON_HEIGHT = FIELD_OFFSET_UP - 10;
+	int BUTTON_HEIGHT = 30;
+	int BUTTON_LEFT_PADDING = 30;
+	int BUTTON_PADDING = 20;
+
+
 
 	Image pictureImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
 	Image mazeImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
@@ -44,11 +48,16 @@ private:
 	int visualizeFrame = 20;
 	int overCount = 0;
 
+	int visualSpanningTreeFlag = 0;
+
 public:
 	Grid<bool> pictureGrid = Grid<bool>(FIELD_WIDTH, FIELD_HEIGHT, false);
 	Grid<int> mazeGrid = Grid<int>(FIELD_WIDTH * 2, FIELD_HEIGHT * 2, 0);
 
 	Point WindowSize() const;
+
+	Color ansSpanningColor = PALETTE[3];
+	Color outAnsSpanningColor = PALETTE[5];
 
 	void TextureScaled();
 
@@ -90,6 +99,8 @@ public:
 	void DrawRouteDot(const Point& drawPoint);
 
 	void DrawRouteBetweenDot(const Point& drawPointFrom, const Point& drawPointTo);
+
+	void VisualizeFrameSpeedSlider();
 
 	void VisualizeRoute();
 
