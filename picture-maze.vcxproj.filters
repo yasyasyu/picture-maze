@@ -156,6 +156,9 @@
     <ClCompile Include="AppMode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IOSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="App\icon.ico">
@@ -798,6 +801,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Application.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IOSystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

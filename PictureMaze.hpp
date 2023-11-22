@@ -29,8 +29,6 @@ private:
 
 
 
-	Image pictureImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
-	Image mazeImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
 	DynamicTexture texture = DynamicTexture(pictureImage);
 
 	bool spanningTreeView = false;
@@ -52,12 +50,16 @@ private:
 
 	int visualSpanningTreeFlag = 0;
 
-	bool isRandomSeed = true;
 	bool isRandizeSeed = false;
 
+	uint64 seed;
 	TextEditState seedText;
+	bool isRandomSeed = true;
 
 public:
+	Image pictureImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
+	Image mazeImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
+
 	Grid<bool> pictureGrid = Grid<bool>(FIELD_WIDTH, FIELD_HEIGHT, false);
 	Grid<int> mazeGrid = Grid<int>(FIELD_WIDTH * 2, FIELD_HEIGHT * 2, 0);
 
@@ -65,8 +67,6 @@ public:
 
 	Color ansSpanningColor = PALETTE[3];
 	Color outAnsSpanningColor = PALETTE[5];
-
-	uint64 seed;
 
 	void TextureScaled();
 
@@ -90,7 +90,7 @@ public:
 
 	bool DrawDot(const Input& mouse, Point& previousMousePoint);
 
-	void SaveImage();
+	void SaveFile();
 
 	void ResetCanvas();
 
@@ -124,6 +124,7 @@ public:
 	 */
 	bool ChangeMazeMode();
 
+	String SeedOutput();
 
 	void MazeTerminate();
 };

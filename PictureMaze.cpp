@@ -200,16 +200,17 @@ bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint)
 	return returnFlag;
 }
 
-void PictureMaze::SaveImage()
+
+void PictureMaze::SaveFile()
 {
-	if (SimpleGUI::Button(U"SaveImage",
+	if (SimpleGUI::Button(U"SaveFile",
 		Vec2{
 			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
 			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 7
 		},
 		120))
 	{
-		pictureImage.saveWithDialog();
+
 	}
 }
 
@@ -534,6 +535,16 @@ void PictureMaze::SeedInputBox(bool isActive)
 		this->SetSeed(seedText.text.hash());
 	}
 
+}
+
+String PictureMaze::SeedOutput()
+{
+	if (this->isRandomSeed)
+	{
+		return U"";
+	}
+
+	return this->seedText.text;
 }
 
 /**

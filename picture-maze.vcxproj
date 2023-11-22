@@ -117,6 +117,7 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="AppMode.cpp" />
+    <ClCompile Include="IOSystem.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MazeUtility.cpp" />
     <ClCompile Include="PictureMaze.cpp" />
@@ -321,6 +322,7 @@
   <ItemGroup>
     <ClInclude Include="Application.hpp" />
     <ClInclude Include="AppMode.hpp" />
+    <ClInclude Include="IOSystem.hpp" />
     <ClInclude Include="MazeUtility.hpp" />
     <ClInclude Include="PictureMaze.hpp" />
     <ClInclude Include="stdafx.h" />
