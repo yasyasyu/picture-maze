@@ -97,6 +97,15 @@ void PictureMaze::SolveMaze()
 
 bool PictureMaze::ReMaze()
 {
+	if (!this->isRandomSeed && !isRandizeSeed)
+	{
+		return false;
+	}
+	if (isRandizeSeed)
+	{
+		isRandizeSeed = false;
+		return true;
+	}
 	if (SimpleGUI::Button(U"ReMaze",
 		Vec2{
 			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
@@ -105,6 +114,7 @@ bool PictureMaze::ReMaze()
 	{
 		return true;
 	}
+
 	return false;
 }
 
@@ -465,6 +475,65 @@ void PictureMaze::VisualizeRoute()
 			DrawRouteBetweenDot(ansRoute[i - 1], ansRoute[i]);
 	}
 	TextureFill(AppMode::Maze);
+}
+
+
+void PictureMaze::SetSeed()
+{
+	this->seed = Random<uint64>(1000000000);
+}
+
+void PictureMaze::SetSeed(uint64 seed)
+{
+	this->seed = seed;
+}
+
+void PictureMaze::MazeTerminate()
+{
+	if (this->isRandomSeed)
+	{
+		this->SetSeed();
+	}
+}
+
+void PictureMaze::RandomCheckBox()
+{
+	if (SimpleGUI::CheckBox(this->isRandomSeed, U"ランダム",
+		Vec2{
+			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 6
+		}
+	))
+	{
+		if (this->isRandomSeed)
+		{
+			this->SetSeed();
+		}
+		else
+		{
+			this->SetSeed(seedText.text.hash());
+		}
+		this->isRandizeSeed = true;
+	}
+	
+}
+
+void PictureMaze::SeedInputBox(bool isActive)
+{
+	if (this->isRandomSeed) return;
+	SimpleGUI::TextBox(this->seedText,
+		Vec2{
+		FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 5
+	},
+		160, 13, isActive
+	);
+
+	if (seedText.textChanged)
+	{
+		this->SetSeed(seedText.text.hash());
+	}
+
 }
 
 /**

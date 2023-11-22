@@ -39,6 +39,8 @@ private:
 	Array<Point> ansRoute = {};
 
 	void SetRoute(const Array<Point>& route);
+	void SetSeed();
+	void SetSeed(uint64 seed);
 
 	bool isRoute = false;
 
@@ -50,6 +52,11 @@ private:
 
 	int visualSpanningTreeFlag = 0;
 
+	bool isRandomSeed = true;
+	bool isRandizeSeed = false;
+
+	TextEditState seedText;
+
 public:
 	Grid<bool> pictureGrid = Grid<bool>(FIELD_WIDTH, FIELD_HEIGHT, false);
 	Grid<int> mazeGrid = Grid<int>(FIELD_WIDTH * 2, FIELD_HEIGHT * 2, 0);
@@ -58,6 +65,8 @@ public:
 
 	Color ansSpanningColor = PALETTE[3];
 	Color outAnsSpanningColor = PALETTE[5];
+
+	uint64 seed;
 
 	void TextureScaled();
 
@@ -87,6 +96,10 @@ public:
 
 	bool PrintSpanningTreeButton();
 
+	void RandomCheckBox();
+
+	void SeedInputBox(bool isActive);
+
 	/**
 	 * @fn 全域木を盤面上に表示。
 	 * @brief 全域木を迷路上に表示する。
@@ -111,4 +124,6 @@ public:
 	 */
 	bool ChangeMazeMode();
 
+
+	void MazeTerminate();
 };
