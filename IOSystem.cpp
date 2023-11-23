@@ -14,9 +14,17 @@ namespace DefaultFileName
 	}
 };
 
-void InputSystem::InputFile()
+void InputSystem::FileInput(PictureMaze& pictureMaze)
 {
-
+	Array<Array<bool>> loadPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
+	for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
+	{
+		for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
+		{
+			pictureMaze.pictureGrid[i][j] = loadPictureGrid[i][j];
+			pictureMaze.UpdateDot(Point(j, i), (loadPictureGrid[i][j] ? PALETTE[1] : PALETTE[0]));
+		}
+	}
 }
 
 OutputSystem::OutputSystem()
@@ -89,7 +97,7 @@ void OutputSystem::FileSave(PictureMaze& pictureMaze, FilePath folderPath, Strin
 
 void OutputSystem::FileOutPut(PictureMaze& pictureMaze, bool isOrigin)
 {
-	Optional<FilePath> parentFolder;
+	Optional<FilePath> saveFolder;
 	String fileName;
 
 	if (isOrigin)
@@ -99,7 +107,7 @@ void OutputSystem::FileOutPut(PictureMaze& pictureMaze, bool isOrigin)
 		{
 			return;
 		}
-		parentFolder = FileSystem::ParentPath(filePath.value());
+		saveFolder = FileSystem::ParentPath(filePath.value());
 		fileName = FileSystem::BaseName(filePath.value());
 
 	}
@@ -108,13 +116,13 @@ void OutputSystem::FileOutPut(PictureMaze& pictureMaze, bool isOrigin)
 		{
 			return;
 		}
-		parentFolder = this->parentFolder;
+		saveFolder = this->parentFolder;
 		fileName = this->defaultFileName;
 	}
 
 	this->FileSave(
 		pictureMaze,
-		FileSystem::PathAppend(FileSystem::FullPath(parentFolder.value()), fileName),
+		FileSystem::PathAppend(FileSystem::FullPath(saveFolder.value()), fileName),
 		fileName
 	);
 	Print << U"Save";

@@ -118,6 +118,17 @@ bool PictureMaze::ReMaze()
 	return false;
 }
 
+void PictureMaze::UpdateDot(Point target, Color color)
+{
+	for (int32 i = target.y * CELL_CNT + 1; i < (target.y + 1) * CELL_CNT - 1; i++)
+	{
+		for (int32 j = target.x * CELL_CNT + 1; j < (target.x + 1) * CELL_CNT - 1; j++)
+		{
+			this->pictureImage[i][j] = color;
+		}
+	}
+}
+
 bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint)
 {
 	Point nowPoint = (Cursor::Pos() - FIELD_OFFSET) / (CELL_SIZE * CELL_CNT);
@@ -142,13 +153,7 @@ bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint)
 		Color paintColor = (mouse == MouseL) ? PALETTE[1] : PALETTE[0];
 		if (0 <= nowPoint.x && nowPoint.x < FIELD_WIDTH && 0 <= nowPoint.y && nowPoint.y < FIELD_HEIGHT)
 		{
-			for (int32 i = nowPoint.y * CELL_CNT + 1; i < (nowPoint.y + 1) * CELL_CNT - 1; i++)
-			{
-				for (int32 j = nowPoint.x * CELL_CNT + 1; j < (nowPoint.x + 1) * CELL_CNT - 1; j++)
-				{
-					pictureImage[i][j] = paintColor;
-				}
-			}
+			this->UpdateDot(nowPoint, paintColor);
 			pictureGrid[nowPoint] = mouse == MouseL;
 			returnFlag = true;
 		}
@@ -177,13 +182,8 @@ bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint)
 				{
 					if (0 <= cellPoint.x && cellPoint.x < FIELD_WIDTH && 0 <= cellPoint.y && cellPoint.y < FIELD_HEIGHT)
 					{
-						for (int32 i = cellPoint.y * CELL_CNT + 1; i < (cellPoint.y + 1) * CELL_CNT - 1; i++)
-						{
-							for (int32 j = cellPoint.x * CELL_CNT + 1; j < (cellPoint.x + 1) * CELL_CNT - 1; j++)
-							{
-								pictureImage[i][j] = paintColor;
-							}
-						}
+
+						this->UpdateDot(cellPoint, paintColor);
 						pictureGrid[cellPoint] = mouse == MouseL;
 					}
 				}

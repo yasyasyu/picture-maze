@@ -6,7 +6,7 @@
 class InputSystem
 {
 public:
-	void InputFile();
+	void FileInput(PictureMaze&);
 };
 
 class OutputSystem

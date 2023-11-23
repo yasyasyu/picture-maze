@@ -75,6 +75,7 @@ public:
 
 	void TextureFill(AppMode application);
 
+
 	void DrawGrid();
 
 	void SetStartGoal(Point _start, Point _goal);
@@ -91,6 +92,7 @@ public:
 
 	bool ReMaze();
 
+	void UpdateDot(Point target, Color color);
 	bool DrawDot(const Input& mouse, Point& previousMousePoint);
 
 	bool SaveFile();
