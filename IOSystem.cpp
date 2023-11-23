@@ -23,13 +23,19 @@ namespace InputSystem {
 			return;
 		}
 		const JSON json = JSON::Load(loadJsonFile.value());
-		if (not json)
+		// TODO error処理？
+		// keyの存在、valueのデータ・構造
+		if (not json || !json.hasElement(U"seed") || !json.hasElement(U"picture"))
 		{
+			System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
 			return;
 		}
 
-		// TODO error処理？
-		// keyの存在、valueのデータ・構造
+		if (!json[U"seed"].isString())
+		{
+			System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+			return;
+		}
 
 		String seedText = json[U"seed"].getString();
 		if (!seedText.isEmpty())
@@ -37,13 +43,31 @@ namespace InputSystem {
 			pictureMaze.SeedInput(seedText);
 		}
 
-		Array<Array<bool>> loadPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
+		if (!json[U"picture"].isArray())
+		{
+			System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+			return;
+		}
+
 		auto loadGrid = json[U"picture"].arrayView();
+		Array<Array<bool>> loadPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
 		for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
 		{
+			if (!loadGrid[i].isArray())
+			{
+				System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+				return;
+			}
+
 			auto row = loadGrid[i].arrayView();
 			for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
 			{
+				if (!row[j].isBool())
+				{
+					System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+					return;
+				}
+
 				loadPictureGrid[i][j] = row[j].get<bool>();
 			}
 		}
