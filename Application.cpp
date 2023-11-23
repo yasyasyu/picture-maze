@@ -11,6 +11,15 @@ AppMode Application::mode()
 	return applicationMode;
 }
 
+void Application::ModeChange(AppMode mode)
+{
+	if (applicationMode != mode)
+	{
+		_init = true;
+	}
+	applicationMode = mode;
+}
+
 void Application::ModeChange()
 {
 	_init = true;
@@ -27,7 +36,7 @@ void Application::ModeChange()
 	}
 }
 
-bool Application::init(){
+bool Application::init() {
 	return _init;
 }
 

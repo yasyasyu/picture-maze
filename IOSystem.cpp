@@ -4,8 +4,8 @@
 namespace DefaultFileName
 {
 
-	String PictureImageSuffix(){ return U"_picture.png";}
-	String MazeImageSuffix(){ return U"_maze.png";}
+	String PictureImageSuffix() { return U"_picture.png"; }
+	String MazeImageSuffix() { return U"_maze.png"; }
 	String InfoJsonSuffix() { return U"_info.json"; }
 
 	String SerialFileName(String fileName, int number)
@@ -14,9 +14,49 @@ namespace DefaultFileName
 	}
 };
 
-void InputSystem::InputFile()
-{
+namespace InputSystem {
+	void FileInput(PictureMaze& pictureMaze)
+	{
+		Optional<FilePath> loadJsonFile = Dialog::OpenFile({ FileFilter::JSON() });
+		if (!loadJsonFile.has_value())
+		{
+			return;
+		}
+		const JSON json = JSON::Load(loadJsonFile.value());
+		if (not json)
+		{
+			return;
+		}
 
+		// TODO error処理？
+		// keyの存在、valueのデータ・構造
+
+		String seedText = json[U"seed"].getString();
+		if (!seedText.isEmpty())
+		{
+			pictureMaze.SeedInput(seedText);
+		}
+
+		Array<Array<bool>> loadPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
+		auto loadGrid = json[U"picture"].arrayView();
+		for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
+		{
+			auto row = loadGrid[i].arrayView();
+			for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
+			{
+				loadPictureGrid[i][j] = row[j].get<bool>();
+			}
+		}
+
+		for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
+		{
+			for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
+			{
+				pictureMaze.pictureGrid[i][j] = loadPictureGrid[i][j];
+				pictureMaze.UpdateDot(Point(j, i), (loadPictureGrid[i][j] ? PALETTE[1] : PALETTE[0]));
+			}
+		}
+	}
 }
 
 OutputSystem::OutputSystem()
@@ -89,7 +129,7 @@ void OutputSystem::FileSave(PictureMaze& pictureMaze, FilePath folderPath, Strin
 
 void OutputSystem::FileOutPut(PictureMaze& pictureMaze, bool isOrigin)
 {
-	Optional<FilePath> parentFolder;
+	Optional<FilePath> saveFolder;
 	String fileName;
 
 	if (isOrigin)
@@ -99,22 +139,22 @@ void OutputSystem::FileOutPut(PictureMaze& pictureMaze, bool isOrigin)
 		{
 			return;
 		}
-		parentFolder = FileSystem::ParentPath(filePath.value());
+		saveFolder = FileSystem::ParentPath(filePath.value());
 		fileName = FileSystem::BaseName(filePath.value());
 
 	}
-	else{
+	else {
 		if (!this->ParentFolderSelect())
 		{
 			return;
 		}
-		parentFolder = this->parentFolder;
+		saveFolder = this->parentFolder;
 		fileName = this->defaultFileName;
 	}
 
 	this->FileSave(
 		pictureMaze,
-		FileSystem::PathAppend(FileSystem::FullPath(parentFolder.value()), fileName),
+		FileSystem::PathAppend(FileSystem::FullPath(saveFolder.value()), fileName),
 		fileName
 	);
 	Print << U"Save";

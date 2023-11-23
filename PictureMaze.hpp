@@ -75,6 +75,7 @@ public:
 
 	void TextureFill(AppMode application);
 
+
 	void DrawGrid();
 
 	void SetStartGoal(Point _start, Point _goal);
@@ -91,8 +92,10 @@ public:
 
 	bool ReMaze();
 
+	void UpdateDot(Point target, Color color);
 	bool DrawDot(const Input& mouse, Point& previousMousePoint);
 
+	bool LoadFile();
 	bool SaveFile();
 	bool SaveAsOriginFile();
 
@@ -103,6 +106,8 @@ public:
 	void RandomCheckBox();
 
 	void SeedInputBox(bool isActive);
+	void SeedInput(String);
+	String SeedOutput();
 
 	/**
 	 * @fn 全域木を盤面上に表示。
@@ -128,7 +133,6 @@ public:
 	 */
 	bool ChangeMazeMode();
 
-	String SeedOutput();
 
 	void MazeTerminate();
 };

@@ -3,10 +3,9 @@
 
 
 
-class InputSystem
+namespace InputSystem
 {
-public:
-	void InputFile();
+	void FileInput(PictureMaze&);
 };
 
 class OutputSystem
