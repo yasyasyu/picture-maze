@@ -51,10 +51,11 @@ private:
 
 	int visualSpanningTreeFlag = 0;
 
-	bool isRandizeSeed = false;
+	bool isRandomizeSeed = false;
 
 	TextEditState seedText;
 	bool isRandomSeed = true;
+	uint64 seed;
 
 public:
 	Image pictureImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
@@ -68,7 +69,7 @@ public:
 	Color ansSpanningColor = PALETTE[3];
 	Color outAnsSpanningColor = PALETTE[5];
 
-	uint64 seed;
+	uint64 GetSeed() { return seed; };
 
 	void TextureScaled();
 

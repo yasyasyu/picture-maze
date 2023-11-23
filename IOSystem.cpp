@@ -41,7 +41,7 @@ bool OutputSystem::ParentFolderSelect()
 
 void OutputSystem::FileSave(PictureMaze& pictureMaze, FilePath folderPath, String fileName)
 {
-	//TODO File重複ずらし
+	// File重複ずらし
 	if (FileSystem::Exists(folderPath))
 	{
 		FilePath tmpFolderPath;
@@ -72,6 +72,16 @@ void OutputSystem::FileSave(PictureMaze& pictureMaze, FilePath folderPath, Strin
 
 	JSON json;
 	json[U"seed"] = pictureMaze.SeedOutput();
+	Array<Array<bool>> outPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
+	for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
+	{
+		for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
+		{
+			outPictureGrid[i][j] = pictureMaze.pictureGrid[i][j];
+		}
+	}
+
+	json[U"picture"] = outPictureGrid;
 	json.saveMinimum(
 		FileSystem::PathAppend(folderPath, fileName + DefaultFileName::InfoJsonSuffix())
 	);

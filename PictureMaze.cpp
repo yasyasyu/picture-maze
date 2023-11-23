@@ -97,13 +97,13 @@ void PictureMaze::SolveMaze()
 
 bool PictureMaze::ReMaze()
 {
-	if (!this->isRandomSeed && !isRandizeSeed)
+	if (!this->isRandomSeed && !isRandomizeSeed)
 	{
 		return false;
 	}
-	if (isRandizeSeed)
+	if (isRandomizeSeed)
 	{
-		isRandizeSeed = false;
+		isRandomizeSeed = false;
 		return true;
 	}
 	if (SimpleGUI::Button(U"ReMaze",
@@ -211,14 +211,7 @@ bool PictureMaze::SaveFile()
 		120))
 	{
 		const MessageBoxResult result = System::MessageBoxOKCancel(U"保存", U"データを保存しますか");
-		if (result == MessageBoxResult::Cancel || result == MessageBoxResult::Cancel)
-		{
-			return false;
-		}
-		if (result == MessageBoxResult::OK)
-		{
-			return true;
-		}
+		return result == MessageBoxResult::OK;
 	}
 
 	return false;
@@ -233,14 +226,7 @@ bool PictureMaze::SaveAsOriginFile()
 		120))
 	{
 		const MessageBoxResult result = System::MessageBoxOKCancel(U"保存", U"データを保存しますか");
-		if (result == MessageBoxResult::Cancel || result == MessageBoxResult::Cancel)
-		{
-			return false;
-		}
-		if (result == MessageBoxResult::OK)
-		{
-			return true;
-		}
+		return result == MessageBoxResult::OK;
 	}
 
 	return false;
@@ -546,7 +532,7 @@ void PictureMaze::RandomCheckBox()
 		{
 			this->SetSeed(seedText.text.hash());
 		}
-		this->isRandizeSeed = true;
+		this->isRandomizeSeed = true;
 	}
 	
 }

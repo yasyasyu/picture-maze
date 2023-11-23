@@ -60,7 +60,7 @@ void Main()
 			if (application.init() || pictureMaze.ReMaze())
 			{
 				auto [_ansSpanningTree, _spanningTree, start, goal]
-					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid, pictureMaze.seed);
+					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid, pictureMaze.GetSeed());
 				spanningTree = _ansSpanningTree;
 				outSpanningTree = _spanningTree;
 				pictureMaze.SetStartGoal(start, goal);
