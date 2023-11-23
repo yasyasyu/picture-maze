@@ -109,7 +109,7 @@ bool PictureMaze::ReMaze()
 	if (SimpleGUI::Button(U"ReMaze",
 		Vec2{
 			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
-			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 5
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 4
 		}, 120))
 	{
 		return true;
@@ -124,7 +124,7 @@ void PictureMaze::UpdateDot(Point target, Color color)
 	{
 		for (int32 j = target.x * CELL_CNT + 1; j < (target.x + 1) * CELL_CNT - 1; j++)
 		{
-			this->pictureImage[i][j] = color;
+			pictureImage[i][j] = color;
 		}
 	}
 }
@@ -201,7 +201,21 @@ bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint)
 }
 
 
-bool PictureMaze::SaveFile()
+bool PictureMaze::LoadFile()
+{
+	if (SimpleGUI::Button(U"Load",
+		Vec2{
+			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 6
+		},
+		120))
+	{
+		const MessageBoxResult result = System::MessageBoxOKCancel(U"読み込み", U"データを読み込みしますか");
+		return result == MessageBoxResult::OK;
+	}
+
+	return false;
+}bool PictureMaze::SaveFile()
 {
 	if (SimpleGUI::Button(U"Save",
 		Vec2{
@@ -520,7 +534,7 @@ void PictureMaze::RandomCheckBox()
 	if (SimpleGUI::CheckBox(this->isRandomSeed, U"ランダム",
 		Vec2{
 			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
-			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 6
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 5
 		}
 	))
 	{
@@ -543,7 +557,7 @@ void PictureMaze::SeedInputBox(bool isActive)
 	SimpleGUI::TextBox(this->seedText,
 		Vec2{
 		FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
-			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 5
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 4
 	},
 		160, 13, isActive
 	);
@@ -553,6 +567,12 @@ void PictureMaze::SeedInputBox(bool isActive)
 		this->SetSeed(seedText.text.hash());
 	}
 
+}
+
+void PictureMaze::SeedInput(String input)
+{
+	this->seedText.text = input;
+	this->isRandomSeed = false;
 }
 
 String PictureMaze::SeedOutput()

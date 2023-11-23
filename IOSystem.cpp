@@ -14,15 +14,46 @@ namespace DefaultFileName
 	}
 };
 
-void InputSystem::FileInput(PictureMaze& pictureMaze)
-{
-	Array<Array<bool>> loadPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
-	for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
+namespace InputSystem{
+	void FileInput(PictureMaze & pictureMaze)
 	{
-		for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
+		Optional<FilePath> loadJsonFile = Dialog::OpenFile({ FileFilter::JSON() });
+		if (!loadJsonFile.has_value())
 		{
-			pictureMaze.pictureGrid[i][j] = loadPictureGrid[i][j];
-			pictureMaze.UpdateDot(Point(j, i), (loadPictureGrid[i][j] ? PALETTE[1] : PALETTE[0]));
+			return;
+		}
+		const JSON json = JSON::Load(loadJsonFile.value());
+		if (not json)
+		{
+			return;
+		}
+
+		// TODO error処理？
+
+		String seedText = json[U"seed"].getString();
+		if (!seedText.isEmpty())
+		{
+			pictureMaze.SeedInput(seedText);
+		}
+
+		Array<Array<bool>> loadPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
+		auto loadGrid = json[U"picture"].arrayView();
+		for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
+		{
+			auto row = loadGrid[i].arrayView();
+			for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
+			{
+				loadPictureGrid[i][j] = row[j].get<bool>();
+			}
+		}
+
+		for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
+		{
+			for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
+			{
+				pictureMaze.pictureGrid[i][j] = loadPictureGrid[i][j];
+				pictureMaze.UpdateDot(Point(j, i), (loadPictureGrid[i][j] ? PALETTE[1] : PALETTE[0]));
+			}
 		}
 	}
 }

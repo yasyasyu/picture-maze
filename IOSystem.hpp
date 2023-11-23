@@ -3,9 +3,8 @@
 
 
 
-class InputSystem
+namespace InputSystem
 {
-public:
 	void FileInput(PictureMaze&);
 };
 

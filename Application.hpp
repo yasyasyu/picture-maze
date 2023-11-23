@@ -11,6 +11,7 @@ public:
 
 	AppMode mode();
 
+	void ModeChange(AppMode);
 	void ModeChange();
 
 	bool init();

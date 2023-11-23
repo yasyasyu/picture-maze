@@ -88,6 +88,13 @@ void Main()
 			break;
 		}
 
+		if (pictureMaze.LoadFile())
+		{
+			InputSystem::FileInput(pictureMaze);
+			pictureMaze.TextureFill(AppMode::Paint);
+			application.ModeChange(AppMode::Paint);
+		}
+
 		if (pictureMaze.SaveFile())
 		{
 			output.FileOutPut(pictureMaze);
