@@ -36,7 +36,7 @@ void Application::ModeChange()
 	}
 }
 
-bool Application::init(){
+bool Application::init() {
 	return _init;
 }
 

@@ -4,8 +4,8 @@
 namespace DefaultFileName
 {
 
-	String PictureImageSuffix(){ return U"_picture.png";}
-	String MazeImageSuffix(){ return U"_maze.png";}
+	String PictureImageSuffix() { return U"_picture.png"; }
+	String MazeImageSuffix() { return U"_maze.png"; }
 	String InfoJsonSuffix() { return U"_info.json"; }
 
 	String SerialFileName(String fileName, int number)
@@ -14,8 +14,8 @@ namespace DefaultFileName
 	}
 };
 
-namespace InputSystem{
-	void FileInput(PictureMaze & pictureMaze)
+namespace InputSystem {
+	void FileInput(PictureMaze& pictureMaze)
 	{
 		Optional<FilePath> loadJsonFile = Dialog::OpenFile({ FileFilter::JSON() });
 		if (!loadJsonFile.has_value())
@@ -29,6 +29,7 @@ namespace InputSystem{
 		}
 
 		// TODO error処理？
+		// keyの存在、valueのデータ・構造
 
 		String seedText = json[U"seed"].getString();
 		if (!seedText.isEmpty())
@@ -142,7 +143,7 @@ void OutputSystem::FileOutPut(PictureMaze& pictureMaze, bool isOrigin)
 		fileName = FileSystem::BaseName(filePath.value());
 
 	}
-	else{
+	else {
 		if (!this->ParentFolderSelect())
 		{
 			return;

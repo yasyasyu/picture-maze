@@ -5,11 +5,11 @@ void PictureMaze::SetRoute(const Array<Point>& route)
 	isRoute = true;
 	this->ansRoute = route;
 }
-	
+
 Point PictureMaze::WindowSize() const {
 	return Point(
-		CELL_SIZE * FIELD_WIDTH  * CELL_CNT + FIELD_OFFSET_LEFT + FIELD_OFFSET_RIGHT,
-		CELL_SIZE * FIELD_HEIGHT * CELL_CNT + FIELD_OFFSET_UP   + FIELD_OFFSET_DOWN
+		CELL_SIZE * FIELD_WIDTH * CELL_CNT + FIELD_OFFSET_LEFT + FIELD_OFFSET_RIGHT,
+		CELL_SIZE * FIELD_HEIGHT * CELL_CNT + FIELD_OFFSET_UP + FIELD_OFFSET_DOWN
 	);
 }
 
@@ -548,7 +548,7 @@ void PictureMaze::RandomCheckBox()
 		}
 		this->isRandomizeSeed = true;
 	}
-	
+
 }
 
 void PictureMaze::SeedInputBox(bool isActive)
