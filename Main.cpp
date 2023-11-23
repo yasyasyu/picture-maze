@@ -1,12 +1,13 @@
 ﻿# include <Siv3D.hpp> // OpenSiv3D v0.6.10
 # include "AppMode.hpp"
-# include "PictureMaze.hpp"
 # include "Application.hpp"
+# include "PictureMaze.hpp"
+# include "IOSystem.hpp"
 
 void Main()
 {
 	PictureMaze pictureMaze;
-	Application app;
+	Application application = Application();
 	// Window Size
 	Window::Resize(pictureMaze.WindowSize());
 
@@ -20,19 +21,20 @@ void Main()
 	Array<Array<int32>> spanningTree;
 	Array<Array<int32>> outSpanningTree;
 	Point previousMousePoint = Point(-1, -1);
+	OutputSystem output = OutputSystem();
 
 	while (System::Update())
 	{
 		pictureMaze.TextureScaled();
-		switch (app.mode())
+		switch (application.mode())
 		{
 		case AppMode::Paint:
 			//描画モード
 			Cursor::RequestStyle(CursorStyle::Hand);
-			if (app.init())
+			if (application.init())
 			{
 				pictureMaze.DrawGrid();
-				app.InitBreak();
+				application.InitBreak();
 				pictureMaze.TextureFill(AppMode::Paint);
 				previousMousePoint = Point(-1, -1);
 			}
@@ -45,7 +47,7 @@ void Main()
 
 			if (pictureMaze.ChangeMazeMode())
 			{
-				app.ModeChange();
+				application.ModeChange();
 				break;
 			}
 
@@ -55,15 +57,15 @@ void Main()
 
 		case AppMode::Maze:
 			// 迷路モード
-			if (app.init() || pictureMaze.ReMaze())
+			if (application.init() || pictureMaze.ReMaze())
 			{
 				auto [_ansSpanningTree, _spanningTree, start, goal]
-					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid, pictureMaze.seed);
+					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid, pictureMaze.GetSeed());
 				spanningTree = _ansSpanningTree;
 				outSpanningTree = _spanningTree;
 				pictureMaze.SetStartGoal(start, goal);
 				pictureMaze.DrawMaze();
-				app.InitBreak();
+				application.InitBreak();
 				pictureMaze.TextureFill(AppMode::Maze);
 				pictureMaze.MazeTerminate();
 			}
@@ -78,15 +80,24 @@ void Main()
 			pictureMaze.VisualizeFrameSpeedSlider();
 			if (pictureMaze.ReturnPaint())
 			{
-				app.ModeChange();
+				application.ModeChange();
 				break;
 			}
 			break;
 		default:
 			break;
 		}
-		pictureMaze.SaveImage();
+
+		if (pictureMaze.SaveFile())
+		{
+			output.FileOutPut(pictureMaze);
+		}
+
+		if (pictureMaze.SaveAsOriginFile())
+		{
+			output.FileOutPut(pictureMaze, true);
+		}
 		pictureMaze.RandomCheckBox();
-		pictureMaze.SeedInputBox(app.mode() == AppMode::Paint);
+		pictureMaze.SeedInputBox(application.mode() == AppMode::Paint);
 	}
 }

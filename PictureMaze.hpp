@@ -1,6 +1,7 @@
 ﻿#pragma once
 # include "MazeUtility.hpp"
 # include "AppMode.hpp"
+# include "Application.hpp"
 
 class PictureMaze
 {
@@ -29,8 +30,6 @@ private:
 
 
 
-	Image pictureImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
-	Image mazeImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
 	DynamicTexture texture = DynamicTexture(pictureImage);
 
 	bool spanningTreeView = false;
@@ -40,7 +39,7 @@ private:
 
 	void SetRoute(const Array<Point>& route);
 	void SetSeed();
-	void SetSeed(uint64 seed);
+	void SetSeed(uint64);
 
 	bool isRoute = false;
 
@@ -52,12 +51,16 @@ private:
 
 	int visualSpanningTreeFlag = 0;
 
-	bool isRandomSeed = true;
-	bool isRandizeSeed = false;
+	bool isRandomizeSeed = false;
 
 	TextEditState seedText;
+	bool isRandomSeed = true;
+	uint64 seed;
 
 public:
+	Image pictureImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
+	Image mazeImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
+
 	Grid<bool> pictureGrid = Grid<bool>(FIELD_WIDTH, FIELD_HEIGHT, false);
 	Grid<int> mazeGrid = Grid<int>(FIELD_WIDTH * 2, FIELD_HEIGHT * 2, 0);
 
@@ -66,7 +69,7 @@ public:
 	Color ansSpanningColor = PALETTE[3];
 	Color outAnsSpanningColor = PALETTE[5];
 
-	uint64 seed;
+	uint64 GetSeed() { return seed; };
 
 	void TextureScaled();
 
@@ -90,7 +93,8 @@ public:
 
 	bool DrawDot(const Input& mouse, Point& previousMousePoint);
 
-	void SaveImage();
+	bool SaveFile();
+	bool SaveAsOriginFile();
 
 	void ResetCanvas();
 
@@ -124,6 +128,7 @@ public:
 	 */
 	bool ChangeMazeMode();
 
+	String SeedOutput();
 
 	void MazeTerminate();
 };

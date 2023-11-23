@@ -97,13 +97,13 @@ void PictureMaze::SolveMaze()
 
 bool PictureMaze::ReMaze()
 {
-	if (!this->isRandomSeed && !isRandizeSeed)
+	if (!this->isRandomSeed && !isRandomizeSeed)
 	{
 		return false;
 	}
-	if (isRandizeSeed)
+	if (isRandomizeSeed)
 	{
-		isRandizeSeed = false;
+		isRandomizeSeed = false;
 		return true;
 	}
 	if (SimpleGUI::Button(U"ReMaze",
@@ -200,17 +200,36 @@ bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint)
 	return returnFlag;
 }
 
-void PictureMaze::SaveImage()
+
+bool PictureMaze::SaveFile()
 {
-	if (SimpleGUI::Button(U"SaveImage",
+	if (SimpleGUI::Button(U"Save",
 		Vec2{
 			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
 			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 7
 		},
 		120))
 	{
-		pictureImage.saveWithDialog();
+		const MessageBoxResult result = System::MessageBoxOKCancel(U"保存", U"データを保存しますか");
+		return result == MessageBoxResult::OK;
 	}
+
+	return false;
+}
+bool PictureMaze::SaveAsOriginFile()
+{
+	if (SimpleGUI::Button(U"Save as",
+		Vec2{
+			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 8
+		},
+		120))
+	{
+		const MessageBoxResult result = System::MessageBoxOKCancel(U"保存", U"データを保存しますか");
+		return result == MessageBoxResult::OK;
+	}
+
+	return false;
 }
 
 void PictureMaze::ResetCanvas()
@@ -483,9 +502,9 @@ void PictureMaze::SetSeed()
 	this->seed = Random<uint64>(1000000000);
 }
 
-void PictureMaze::SetSeed(uint64 seed)
+void PictureMaze::SetSeed(uint64 setSeed)
 {
-	this->seed = seed;
+	this->seed = setSeed;
 }
 
 void PictureMaze::MazeTerminate()
@@ -513,7 +532,7 @@ void PictureMaze::RandomCheckBox()
 		{
 			this->SetSeed(seedText.text.hash());
 		}
-		this->isRandizeSeed = true;
+		this->isRandomizeSeed = true;
 	}
 	
 }
@@ -534,6 +553,16 @@ void PictureMaze::SeedInputBox(bool isActive)
 		this->SetSeed(seedText.text.hash());
 	}
 
+}
+
+String PictureMaze::SeedOutput()
+{
+	if (this->isRandomSeed)
+	{
+		return U"";
+	}
+
+	return this->seedText.text;
 }
 
 /**
