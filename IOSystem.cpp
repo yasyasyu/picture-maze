@@ -1,10 +1,18 @@
 ﻿
 #include "IOSystem.hpp"
 
+namespace DefaultFileName
+{
 
-String DefaultFileName::SerialFileName(String fileName, int number) {
-	return fileName + U"({})"_fmt(number);
-}
+	String PictureImageSuffix(){ return U"_picture.png";}
+	String MazeImageSuffix(){ return U"_maze.png";}
+	String InfoJsonSuffix() { return U"_info.json"; }
+
+	String SerialFileName(String fileName, int number)
+	{
+		return fileName + U"({})"_fmt(number);
+	}
+};
 
 void InputSystem::InputFile()
 {
@@ -13,13 +21,7 @@ void InputSystem::InputFile()
 
 OutputSystem::OutputSystem()
 {
-	this->createCount = 0;
 	this->defaultFileName = U"PictureMaze";
-}
-
-void OutputSystem::IncrementCreateCount()
-{
-	this->createCount++;
 }
 
 bool OutputSystem::ParentFolderSelect()
@@ -28,7 +30,6 @@ bool OutputSystem::ParentFolderSelect()
 	{
 		this->parentFolder = Dialog::SelectFolder();
 	}
-	Print << this->parentFolder;
 
 	if (this->parentFolder)
 	{
@@ -37,67 +38,74 @@ bool OutputSystem::ParentFolderSelect()
 
 	return false;
 }
-/*/
-void OutputSystem::FileOutPut(PictureMaze& pictureMaze, String fileName)
-{
 
-	if (!this->ParentFolderSelect())
+void OutputSystem::FileSave(PictureMaze& pictureMaze, FilePath folderPath, String fileName)
+{
+	//TODO File重複ずらし
+	if (FileSystem::Exists(folderPath))
 	{
-		return;
+		FilePath tmpFolderPath;
+		int number = 1;
+		do {
+			tmpFolderPath = DefaultFileName::SerialFileName(folderPath, number);
+			number++;
+		} while (FileSystem::Exists(tmpFolderPath));
+
+		folderPath = tmpFolderPath;
+		fileName = FileSystem::BaseName(folderPath);
 	}
 
-	FilePath folderPath = FileSystem::PathAppend(FileSystem::FullPath(this->parentFolder.value()), fileName);
 	if (!FileSystem::CreateDirectories(folderPath))
 	{
 		// error
 		return;
 	}
+
+	Print << folderPath + U"/" + fileName + U"_";
+
 	pictureMaze.pictureImage.save(
-		FileSystem::PathAppend(folderPath, fileName + FileName::pictureImageSuffix), ImageFormat::PNG
+		FileSystem::PathAppend(folderPath, fileName + DefaultFileName::PictureImageSuffix()), ImageFormat::PNG
 	);
 	pictureMaze.mazeImage.save(
-		FileSystem::PathAppend(folderPath, fileName + FileName::mazeImageSuffix), ImageFormat::PNG
+		FileSystem::PathAppend(folderPath, fileName + DefaultFileName::MazeImageSuffix()), ImageFormat::PNG
 	);
 
 	JSON json;
-	json[U"seed"] = pictureMaze.seed;
+	json[U"seed"] = pictureMaze.SeedOutput();
 	json.saveMinimum(
-		FileSystem::PathAppend(folderPath, fileName + FileName::infoJsonSuffix)
+		FileSystem::PathAppend(folderPath, fileName + DefaultFileName::InfoJsonSuffix())
 	);
 }
-*/
-void OutputSystem::DefaultFileOutPut(
-	//PictureMaze pictureMaze
-)
+
+void OutputSystem::FileOutPut(PictureMaze& pictureMaze, bool isOrigin)
 {
-	//this->FileOutPut(pictureMaze, FileName::SerialFileName(application.defaultFileName, this->createCount));
+	Optional<FilePath> parentFolder;
+	String fileName;
 
-	if (!this->ParentFolderSelect())
+	if (isOrigin)
 	{
-		return;
+		Optional<FilePath> filePath = Dialog::SaveFile({});
+		if (!filePath.has_value())
+		{
+			return;
+		}
+		parentFolder = FileSystem::ParentPath(filePath.value());
+		fileName = FileSystem::BaseName(filePath.value());
+
+	}
+	else{
+		if (!this->ParentFolderSelect())
+		{
+			return;
+		}
+		parentFolder = this->parentFolder;
+		fileName = this->defaultFileName;
 	}
 
-	String fileName = DefaultFileName::SerialFileName(this->defaultFileName, this->createCount);
-
-	FilePath folderPath = FileSystem::PathAppend(FileSystem::FullPath(this->parentFolder.value()), fileName);
-	if (!FileSystem::CreateDirectories(folderPath))
-	{
-		// error
-		return;
-	}
+	this->FileSave(
+		pictureMaze,
+		FileSystem::PathAppend(FileSystem::FullPath(parentFolder.value()), fileName),
+		fileName
+	);
 	Print << U"Save";
-	//pictureMaze.pictureImage.save(
-	//	FileSystem::PathAppend(folderPath, fileName + DefaultFileName::pictureImageSuffix), ImageFormat::PNG
-	//);
-	//pictureMaze.mazeImage.save(
-	//	FileSystem::PathAppend(folderPath, fileName + DefalutFileName::mazeImageSuffix), ImageFormat::PNG
-	//);
-
-	//JSON json;
-	//json[U"seed"] = pictureMaze.SeedOutput();
-	//json.saveMinimum(
-	//	FileSystem::PathAppend(folderPath, fileName + DefalutFileName::infoJsonSuffix)
-	//);
-
-	this->IncrementCreateCount();
 }

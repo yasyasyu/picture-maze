@@ -203,10 +203,32 @@ bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint)
 
 bool PictureMaze::SaveFile()
 {
-	if (SimpleGUI::Button(U"SaveFile",
+	if (SimpleGUI::Button(U"Save",
 		Vec2{
 			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
 			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 7
+		},
+		120))
+	{
+		const MessageBoxResult result = System::MessageBoxOKCancel(U"保存", U"データを保存しますか");
+		if (result == MessageBoxResult::Cancel || result == MessageBoxResult::Cancel)
+		{
+			return false;
+		}
+		if (result == MessageBoxResult::OK)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+bool PictureMaze::SaveAsOriginFile()
+{
+	if (SimpleGUI::Button(U"Save as",
+		Vec2{
+			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 8
 		},
 		120))
 	{

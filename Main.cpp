@@ -87,11 +87,15 @@ void Main()
 		default:
 			break;
 		}
+
 		if (pictureMaze.SaveFile())
 		{
-			output.DefaultFileOutPut(
-				//pictureMaze
-			);
+			output.FileOutPut(pictureMaze);
+		}
+
+		if (pictureMaze.SaveAsOriginFile())
+		{
+			output.FileOutPut(pictureMaze, true);
 		}
 		pictureMaze.RandomCheckBox();
 		pictureMaze.SeedInputBox(application.mode() == AppMode::Paint);

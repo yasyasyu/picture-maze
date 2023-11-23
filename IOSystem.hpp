@@ -1,14 +1,7 @@
 ﻿#pragma once
+# include "PictureMaze.hpp"
 
-namespace DefaultFileName
-{
 
-	const String pictureImageSuffix = U"_picture";
-	const String mazeImageSuffix = U"_maze";
-	const String infoJsonSuffix = U"_info";
-
-	String SerialFileName(String fileName, int number);
-};
 
 class InputSystem
 {
@@ -20,8 +13,6 @@ class OutputSystem
 {
 private:
 	Optional<FilePath> parentFolder;
-	int createCount;
-	void IncrementCreateCount();
 	String defaultFileName;
 
 public:
@@ -29,9 +20,6 @@ public:
 
 	bool ParentFolderSelect();
 
-	void DefaultFileOutPut(
-		//PictureMaze pictureMaze
-	);
-
-	//void FileOutPut(PictureMaze& pictureMaze, String fileName);
+	void FileOutPut(PictureMaze& pictureMaze, bool isOrigin = false);
+	void FileSave(PictureMaze& pictureMaze, String folderPath, String fileName);
 };

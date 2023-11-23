@@ -93,6 +93,7 @@ public:
 	bool DrawDot(const Input& mouse, Point& previousMousePoint);
 
 	bool SaveFile();
+	bool SaveAsOriginFile();
 
 	void ResetCanvas();
 
