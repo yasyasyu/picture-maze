@@ -17,3 +17,5 @@ enum class AppMode
 	Paint,
 	Maze
 };
+
+

@@ -4,15 +4,16 @@
 class Application
 {
 private:
-	AppMode applicationMode = AppMode::Paint;
-	bool _init = true;
-
+	AppMode applicationMode;
+	bool _init;
 public:
-	AppMode mode() const;
+	Application();
+
+	AppMode mode();
 
 	void ModeChange();
 
-	bool init() const;
+	bool init();
 
 	void InitBreak();
 };

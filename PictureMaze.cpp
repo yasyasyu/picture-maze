@@ -201,7 +201,7 @@ bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint)
 }
 
 
-void PictureMaze::SaveFile()
+bool PictureMaze::SaveFile()
 {
 	if (SimpleGUI::Button(U"SaveFile",
 		Vec2{
@@ -210,8 +210,18 @@ void PictureMaze::SaveFile()
 		},
 		120))
 	{
-
+		const MessageBoxResult result = System::MessageBoxOKCancel(U"保存", U"データを保存しますか");
+		if (result == MessageBoxResult::Cancel || result == MessageBoxResult::Cancel)
+		{
+			return false;
+		}
+		if (result == MessageBoxResult::OK)
+		{
+			return true;
+		}
 	}
+
+	return false;
 }
 
 void PictureMaze::ResetCanvas()
@@ -484,9 +494,9 @@ void PictureMaze::SetSeed()
 	this->seed = Random<uint64>(1000000000);
 }
 
-void PictureMaze::SetSeed(uint64 seed)
+void PictureMaze::SetSeed(uint64 setSeed)
 {
-	this->seed = seed;
+	this->seed = setSeed;
 }
 
 void PictureMaze::MazeTerminate()

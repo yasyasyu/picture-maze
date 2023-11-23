@@ -1,6 +1,12 @@
 ﻿# include "Application.hpp"
 
-AppMode Application::mode() const
+Application::Application()
+{
+	this->applicationMode = AppMode::Paint;
+	this->_init = true;
+}
+
+AppMode Application::mode()
 {
 	return applicationMode;
 }
@@ -21,7 +27,7 @@ void Application::ModeChange()
 	}
 }
 
-bool Application::init() const {
+bool Application::init(){
 	return _init;
 }
 

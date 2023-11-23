@@ -1,6 +1,7 @@
 ﻿#pragma once
 # include "MazeUtility.hpp"
 # include "AppMode.hpp"
+# include "Application.hpp"
 
 class PictureMaze
 {
@@ -38,7 +39,7 @@ private:
 
 	void SetRoute(const Array<Point>& route);
 	void SetSeed();
-	void SetSeed(uint64 seed);
+	void SetSeed(uint64);
 
 	bool isRoute = false;
 
@@ -52,7 +53,6 @@ private:
 
 	bool isRandizeSeed = false;
 
-	uint64 seed;
 	TextEditState seedText;
 	bool isRandomSeed = true;
 
@@ -67,6 +67,8 @@ public:
 
 	Color ansSpanningColor = PALETTE[3];
 	Color outAnsSpanningColor = PALETTE[5];
+
+	uint64 seed;
 
 	void TextureScaled();
 
@@ -90,7 +92,7 @@ public:
 
 	bool DrawDot(const Input& mouse, Point& previousMousePoint);
 
-	void SaveFile();
+	bool SaveFile();
 
 	void ResetCanvas();
 
