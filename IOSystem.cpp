@@ -125,8 +125,6 @@ void OutputSystem::FileSave(PictureMaze& pictureMaze, FilePath folderPath, Strin
 		return;
 	}
 
-	Print << folderPath + U"/" + fileName + U"_";
-
 	pictureMaze.pictureImage.save(
 		FileSystem::PathAppend(folderPath, fileName + DefaultFileName::PictureImageSuffix()), ImageFormat::PNG
 	);
