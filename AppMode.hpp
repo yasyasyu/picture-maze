@@ -5,8 +5,8 @@ constexpr Color PALETTE[] = {
 	Palette::Black,
 	Palette::Red,
 	Palette::Green,
-	Palette::Blue,
 	Palette::Orange,
+	Palette::Blue,
 	Palette::Hotpink,
 	Palette::Gray
 };

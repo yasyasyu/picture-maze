@@ -6,6 +6,7 @@ namespace DefaultFileName
 
 	String PictureImageSuffix() { return U"_picture.png"; }
 	String MazeImageSuffix() { return U"_maze.png"; }
+	String AnsImageSuffix() { return U"_ans.png"; }
 	String InfoJsonSuffix() { return U"_info.json"; }
 
 	String SerialFileName(String fileName, int number)
@@ -125,12 +126,30 @@ void OutputSystem::FileSave(PictureMaze& pictureMaze, FilePath folderPath, Strin
 		return;
 	}
 
-	pictureMaze.pictureImage.save(
-		FileSystem::PathAppend(folderPath, fileName + DefaultFileName::PictureImageSuffix()), ImageFormat::PNG
-	);
-	pictureMaze.mazeImage.save(
-		FileSystem::PathAppend(folderPath, fileName + DefaultFileName::MazeImageSuffix()), ImageFormat::PNG
-	);
+	{// picture
+		pictureMaze.pictureImage.save(
+			FileSystem::PathAppend(folderPath, fileName + DefaultFileName::PictureImageSuffix()), ImageFormat::PNG
+		);
+	}
+
+	if (pictureMaze.isRoute)
+	{
+		// ans
+		pictureMaze.VisualizeRoute(2);
+		pictureMaze.mazeImage.save(
+			FileSystem::PathAppend(folderPath, fileName + DefaultFileName::AnsImageSuffix()), ImageFormat::PNG
+		);
+	}
+
+	if (pictureMaze.isExistMaze)
+	{
+		// maze
+		pictureMaze.VisualizeRoute(1);
+		pictureMaze.mazeImage.save(
+			FileSystem::PathAppend(folderPath, fileName + DefaultFileName::MazeImageSuffix()), ImageFormat::PNG
+		);
+	}
+
 
 	JSON json;
 	json[U"seed"] = pictureMaze.SeedOutput();
@@ -179,5 +198,4 @@ void OutputSystem::FileOutPut(PictureMaze& pictureMaze, bool isOrigin)
 		FileSystem::PathAppend(FileSystem::FullPath(saveFolder.value()), fileName),
 		fileName
 	);
-	Print << U"Save";
 }
