@@ -68,6 +68,7 @@ void Main()
 				application.InitBreak();
 				pictureMaze.TextureFill(AppMode::Maze);
 				pictureMaze.MazeTerminate();
+				pictureMaze.isExistMaze = true;
 			}
 			if (pictureMaze.PrintSpanningTreeButton())
 			{
@@ -81,6 +82,7 @@ void Main()
 			if (pictureMaze.ReturnPaint())
 			{
 				application.ModeChange();
+				pictureMaze.isExistMaze = false;
 				break;
 			}
 			break;

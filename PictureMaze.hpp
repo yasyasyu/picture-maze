@@ -41,7 +41,8 @@ private:
 	void SetSeed();
 	void SetSeed(uint64);
 
-	bool isRoute = false;
+	void DrawStartGoal();
+
 
 
 	int index = 0;
@@ -68,6 +69,10 @@ public:
 
 	Color ansSpanningColor = PALETTE[3];
 	Color outAnsSpanningColor = PALETTE[5];
+
+
+	int isExistMaze = false;
+	bool isRoute = false;
 
 	uint64 GetSeed() { return seed; };
 
@@ -124,7 +129,7 @@ public:
 
 	void VisualizeFrameSpeedSlider();
 
-	void VisualizeRoute();
+	void VisualizeRoute(int isFull = 0);
 
 	/**
 	 * @fn 迷路モードにする。

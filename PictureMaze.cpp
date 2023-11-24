@@ -26,6 +26,7 @@ void PictureMaze::TextureFill(AppMode application)
 		texture.fill(pictureImage);
 		break;
 	case AppMode::Maze:
+		DrawStartGoal();
 		texture.fill(mazeImage);
 		break;
 	default:
@@ -44,6 +45,23 @@ void PictureMaze::DrawGrid()
 void PictureMaze::SetStartGoal(Point _start, Point _goal) {
 	this->start = _start;
 	this->goal = _goal;
+}
+
+void PictureMaze::DrawStartGoal()
+{
+	Color paintColor[] = { PALETTE[4], PALETTE[5] };
+	Point drawPoint[] = { this->start, this->goal };
+	for (int p = 0; p < 2; p++)
+	{
+		for (int32 i = drawPoint[p].y * HARF_CELL_CNT + 1; i < (drawPoint[p].y + 1) * HARF_CELL_CNT - 1; i++)
+		{
+			for (int32 j = drawPoint[p].x * HARF_CELL_CNT + 1; j < (drawPoint[p].x + 1) * HARF_CELL_CNT - 1; j++)
+			{
+
+				mazeImage[i][j] = paintColor[p];
+			}
+		}
+	}
 }
 
 /**
@@ -468,7 +486,7 @@ void PictureMaze::VisualizeFrameSpeedSlider()
 	}
 }
 
-void PictureMaze::VisualizeRoute()
+void PictureMaze::VisualizeRoute(int isFull)
 {
 	if (!this->isRoute)
 	{
@@ -476,26 +494,41 @@ void PictureMaze::VisualizeRoute()
 		this->count = 0;
 		return;
 	};
-	// update
-	this->count++;
-	if (this->count > this->visualizeFrame)
-	{
-		this->count = 0;
-		this->index++;
 
-		if (this->index > this->ansRoute.size())
+	if (isFull  == 0) {
+		// update
+		this->count++;
+		if (this->count > this->visualizeFrame)
 		{
-			if (this->overCount < 10)
+			this->count = 0;
+			this->index++;
+
+			if (this->index > this->ansRoute.size())
 			{
-				this->index = this->ansRoute.size();
-				this->overCount++;
+				if (this->overCount < 10)
+				{
+					this->index = this->ansRoute.size();
+					this->overCount++;
+				}
+				else {
+					this->index = 0;
+					this->overCount = 0;
+					DrawMaze();
+					this->isRoute = true;
+				}
 			}
-			else {
-				this->index = 0;
-				this->overCount = 0;
-				DrawMaze();
-				this->isRoute = true;
-			}
+		}
+	}
+	else
+	{
+		if (isFull == 1)
+		{
+			DrawMaze();
+			this->index = 0;
+		}
+		if (isFull  == 2)
+		{
+			this->index = this->ansRoute.size();
 		}
 	}
 
