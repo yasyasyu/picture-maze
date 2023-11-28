@@ -202,7 +202,7 @@ namespace MazeUtillity {
 		}
 	}
 
-	std::tuple< Array<Array<int>>, Array<Array<int>>, DisjointSet<int>, int>
+	std::tuple< Array<Array<int>>, Array<Array<int>>, DisjointSet<int>, int, Grid< Array<bool>>>
 		MakeSpanningTree(const Grid<bool>& grid)
 	{
 		int vertex = grid.size().y * grid.size().x;
@@ -219,6 +219,7 @@ namespace MazeUtillity {
 
 		// 境界辺
 		Grid< Array<bool>> ngBorder(grid.size().y, grid.size().x, Array<bool>(2));
+
 		for (int i = 0; i < grid.size().y; i++)
 		{
 			ngBorder[i][grid.size().x - 1][0] = true;
@@ -305,7 +306,7 @@ namespace MazeUtillity {
 			spanningTree[v] << v;
 		}
 
-		return { ansSpanningTree, spanningTree, dsu, dsu.find(ans) };
+		return { ansSpanningTree, spanningTree, dsu, dsu.find(ans), ngBorder};
 	}
 
 	/**
@@ -522,7 +523,7 @@ namespace MazeUtillity {
 	 * @param[out] mazeGrid 迷路用のグリッド
 	 * @return Array<Array<int32>> 全域木
 	 */
-	std::tuple<Array<Array<int32>>, Array<Array<int32>>, Point, Point>
+	std::tuple<Array<Array<int32>>, Array<Array<int32>>, Point, Point, Grid< Array<bool>>>
 		CreateMaze(const Grid<bool>& pictureGrid, Grid<int>& mazeGrid, uint64 seed)
 	{
 		Reseed(seed);
@@ -538,7 +539,7 @@ namespace MazeUtillity {
 			}
 		}
 
-		auto [ansSpanningTree, spanningTree, dsu, ans] = MakeSpanningTree(pictureGrid);
+		auto [ansSpanningTree, spanningTree, dsu, ans, ngBorder] = MakeSpanningTree(pictureGrid);
 
 		for (int u = 0; u < ansSpanningTree.size(); u++)
 		{
@@ -562,7 +563,7 @@ namespace MazeUtillity {
 
 		return
 		{
-			ansSpanningTree, spanningTree, start, goal
+			ansSpanningTree, spanningTree, start, goal, ngBorder
 		};
 	}
 

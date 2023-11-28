@@ -300,7 +300,7 @@ bool PictureMaze::PrintSpanningTreeButton()
 		this->visualSpanningTreeFlag--;
 		if (this->visualSpanningTreeFlag < 0)
 		{
-			this->visualSpanningTreeFlag = 3;
+			this->visualSpanningTreeFlag = 7;
 		}
 	}
 
@@ -344,6 +344,65 @@ void PictureMaze::PrintSpanningTree(Array<Array<int32>> spanningTree, Color colo
 					) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 + 1)
 				) * CELL_SIZE + FIELD_OFFSET
 			).draw(color);
+		}
+	}
+}
+
+void PictureMaze::SetNgBorder(Grid< Array<bool>> ngBorder)
+{
+	this->ngBorder = ngBorder;
+}
+
+void PictureMaze::PrintNgBorder()
+{
+	for (int i = 0; i < this->ngBorder.size().y; i++)
+	{
+		for (int j = 0; j < this->ngBorder.size().x; j++)
+		{
+			if (this->ngBorder[i][j][0] && j < ngBorder.size().x - 1)
+			{
+				// right
+				Rect::FromPoints(
+					(
+						Point(j, i) * CELL_CNT
+						+ Point(1, 1) * CELL_CNT
+						- Point(1, 0)
+						- Point(0, 1) * (CELL_CNT)
+
+						) * CELL_SIZE
+					+ FIELD_OFFSET,
+
+					(
+						Point(j, i) * CELL_CNT
+						+ Point(1, 1) * CELL_CNT
+						+ Point(1, 0)
+						) * CELL_SIZE
+					+ FIELD_OFFSET
+
+				).draw(PALETTE[8]);
+			}
+
+			if (this->ngBorder[i][j][1] && i < ngBorder.size().y - 1)
+			{
+				// bottom
+				Rect::FromPoints(
+					(
+						Point(j, i) * CELL_CNT
+						+ Point(1, 1) * CELL_CNT
+						- Point(0, 1)
+						- Point(1, 0) * (CELL_CNT)
+						) * CELL_SIZE
+					+ FIELD_OFFSET,
+
+					(
+						Point(j, i) * CELL_CNT
+						+ Point(1, 1) * CELL_CNT
+						+ Point(0, 1)
+						) * CELL_SIZE
+					+ FIELD_OFFSET
+
+				).draw(PALETTE[8]);
+			}
 		}
 	}
 }
