@@ -49,7 +49,7 @@ void PictureMaze::SetStartGoal(Point _start, Point _goal) {
 
 void PictureMaze::DrawStartGoal()
 {
-	Color paintColor[] = { PALETTE[4], PALETTE[5] };
+	Color paintColor[] = { PALETTE[2], PALETTE[5] };
 	Point drawPoint[] = { this->start, this->goal };
 	for (int p = 0; p < 2; p++)
 	{
@@ -298,7 +298,10 @@ bool PictureMaze::PrintSpanningTreeButton()
 		180))
 	{
 		this->visualSpanningTreeFlag--;
-		if (this->visualSpanningTreeFlag < 0) this->visualSpanningTreeFlag = 3;
+		if (this->visualSpanningTreeFlag < 0)
+		{
+			this->visualSpanningTreeFlag = 3;
+		}
 	}
 
 	return this->visualSpanningTreeFlag > 0;
@@ -323,45 +326,24 @@ void PictureMaze::PrintSpanningTree(Array<Array<int32>> spanningTree, Color colo
 		{
 			int _frm = frm, _to = to;
 			if (_frm > _to)
+			{
 				std::swap(_frm, _to);
+			}
 
-			Line(
+			Rect::FromPoints(
 				(
 					Point(
 						_frm % FIELD_WIDTH,
 						_frm / FIELD_WIDTH
 					) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 - 1)
-					) * CELL_SIZE + FIELD_OFFSET,
-
+				) * CELL_SIZE + FIELD_OFFSET,
 				(
 					Point(
 						_to % FIELD_WIDTH,
 						_to / FIELD_WIDTH
-					) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 - 1)
-					+ Point(
-						std::abs(_frm % FIELD_WIDTH - _to % FIELD_WIDTH),
-						std::abs(_frm / FIELD_WIDTH - _to / FIELD_WIDTH))
-					) * CELL_SIZE + FIELD_OFFSET
-			).draw(3, color);
-
-			Line(
-				(
-					Point(
-						_frm % FIELD_WIDTH,
-						_frm / FIELD_WIDTH
-					) * CELL_CNT + Point(1, 1) * CELL_CNT / 2
-					- Point(
-						std::abs(_frm % FIELD_WIDTH - _to % FIELD_WIDTH),
-						std::abs(_frm / FIELD_WIDTH - _to / FIELD_WIDTH))
-					) * CELL_SIZE + FIELD_OFFSET,
-
-				(
-					Point(
-						_to % FIELD_WIDTH,
-						_to / FIELD_WIDTH
-					) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2)
-					) * CELL_SIZE + FIELD_OFFSET
-			).draw(3, color);
+					) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 + 1)
+				) * CELL_SIZE + FIELD_OFFSET
+			).draw(color);
 		}
 	}
 }
@@ -446,7 +428,7 @@ void PictureMaze::DrawMaze()
 
 void PictureMaze::DrawRouteDot(const Point& drawPoint)
 {
-	Color paintColor = PALETTE[2];
+	Color paintColor = PALETTE[4];
 
 	for (int32 i = drawPoint.y * HARF_CELL_CNT + 1; i < (drawPoint.y + 1) * HARF_CELL_CNT - 1; i++)
 	{
@@ -460,7 +442,7 @@ void PictureMaze::DrawRouteDot(const Point& drawPoint)
 
 void PictureMaze::DrawRouteBetweenDot(const Point& drawPointFrom, const Point& drawPointTo)
 {
-	Color paintColor = PALETTE[2];
+	Color paintColor = PALETTE[4];
 	int si = std::min(drawPointFrom.y, drawPointTo.y), gi = std::max(drawPointFrom.y, drawPointTo.y);
 	int sj = std::min(drawPointFrom.x, drawPointTo.x), gj = std::max(drawPointFrom.x, drawPointTo.x);
 	for (int32 i = si * HARF_CELL_CNT + 1; i < (gi + 1) * HARF_CELL_CNT - 1; i++)

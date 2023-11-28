@@ -298,6 +298,13 @@ namespace MazeUtillity {
 			}
 		}
 
+		for (int v = 0; v < vertex; v++)
+		{
+			if (dsu.size(v) >= 2) continue;
+
+			spanningTree[v] << v;
+		}
+
 		return { ansSpanningTree, spanningTree, dsu, dsu.find(ans) };
 	}
 
@@ -544,6 +551,7 @@ namespace MazeUtillity {
 		{
 			for (auto v : spanningTree[u])
 			{
+				if (u == v) continue;
 				MakeWall(mazeGrid, u, v);
 			}
 		}
