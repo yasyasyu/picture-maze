@@ -120,7 +120,8 @@ namespace MazeUtillity {
 					Random<int32>(0, ngBorder.size().y - 1)
 				);
 			} while (A == B);
-		} while ((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) < 150);
+
+		} while ((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) < 200);
 
 		if (A.x == B.x)
 		{
@@ -146,6 +147,10 @@ namespace MazeUtillity {
 		}
 		else
 		{
+			if (A.x > B.x)
+			{
+				std::swap(A, B);
+			}
 			HashSet<Point> borders = Bresenham(A, B);
 			HashSet<Point> used;
 			std::queue<Point> que;
@@ -172,11 +177,15 @@ namespace MazeUtillity {
 							if (borders.contains(to))
 							{
 								que.push(to);
-								ngBorder[to.y][to.x][0] = true;
-								if (slant && 0 <= to.x - 1)
-									ngBorder[to.y][to.x - 1][1] = true;
-								if (!slant && to.x + 1 < ngBorder.size().x)
-									ngBorder[to.y][to.x + 1][1] = true;
+								ngBorder[to.y][to.x][1] = true;
+								if (slant && 0 < to.x - 1)
+								{
+									ngBorder[to.y][to.x - 1][0] = true;
+								}
+								else
+								{
+									ngBorder[to.y][to.x][0] = true;
+								}
 								borders.erase(to);
 								used.insert(to);
 							}
@@ -229,7 +238,7 @@ namespace MazeUtillity {
 			ngBorder[grid.size().y - 1][j][1] = true;
 		}
 
-		for (int cnt = 0; cnt < 20; cnt++) setNgBorder(ngBorder);
+		for (int cnt = 0; cnt < 10; cnt++) setNgBorder(ngBorder);
 
 		Grid<int> edgeWeight(vertex, vertex, 0);
 		std::priority_queue pq(
