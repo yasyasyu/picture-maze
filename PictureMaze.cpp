@@ -368,7 +368,7 @@ void PictureMaze::PrintNgBorder()
 						+ Point(1, 1) * CELL_CNT
 						- Point(1, 0)
 						- Point(0, 1) * (CELL_CNT)
-
+						-Point(0, 1) * (!(i == 0 || i + 1 == this->ngBorder.size().y) ? 1 : 0)
 						) * CELL_SIZE
 					+ FIELD_OFFSET,
 
@@ -376,6 +376,7 @@ void PictureMaze::PrintNgBorder()
 						Point(j, i) * CELL_CNT
 						+ Point(1, 1) * CELL_CNT
 						+ Point(1, 0)
+						+ Point(0, 1) * (!(i == 0 || i + 1 == this->ngBorder.size().y) ? 1 : 0)
 						) * CELL_SIZE
 					+ FIELD_OFFSET
 
@@ -391,6 +392,7 @@ void PictureMaze::PrintNgBorder()
 						+ Point(1, 1) * CELL_CNT
 						- Point(0, 1)
 						- Point(1, 0) * (CELL_CNT)
+						-Point(1, 0) * (!(j == 0 || j + 1 == this->ngBorder.size().x) ? 1 : 0)
 						) * CELL_SIZE
 					+ FIELD_OFFSET,
 
@@ -398,6 +400,7 @@ void PictureMaze::PrintNgBorder()
 						Point(j, i) * CELL_CNT
 						+ Point(1, 1) * CELL_CNT
 						+ Point(0, 1)
+						+ Point(1, 0) * (!(j == 0 || j + 1 == this->ngBorder.size().x) ? 1 : 0)
 						) * CELL_SIZE
 					+ FIELD_OFFSET
 
