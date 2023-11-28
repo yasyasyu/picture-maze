@@ -68,7 +68,7 @@ public:
 	Point WindowSize() const;
 
 	Color ansSpanningColor = PALETTE[3];
-	Color outAnsSpanningColor = PALETTE[5];
+	Color outAnsSpanningColor = PALETTE[6];
 
 
 	int isExistMaze = false;

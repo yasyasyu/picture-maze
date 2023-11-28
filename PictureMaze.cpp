@@ -49,7 +49,7 @@ void PictureMaze::SetStartGoal(Point _start, Point _goal) {
 
 void PictureMaze::DrawStartGoal()
 {
-	Color paintColor[] = { PALETTE[4], PALETTE[5] };
+	Color paintColor[] = { PALETTE[2], PALETTE[5] };
 	Point drawPoint[] = { this->start, this->goal };
 	for (int p = 0; p < 2; p++)
 	{
@@ -428,7 +428,7 @@ void PictureMaze::DrawMaze()
 
 void PictureMaze::DrawRouteDot(const Point& drawPoint)
 {
-	Color paintColor = PALETTE[2];
+	Color paintColor = PALETTE[4];
 
 	for (int32 i = drawPoint.y * HARF_CELL_CNT + 1; i < (drawPoint.y + 1) * HARF_CELL_CNT - 1; i++)
 	{
@@ -442,7 +442,7 @@ void PictureMaze::DrawRouteDot(const Point& drawPoint)
 
 void PictureMaze::DrawRouteBetweenDot(const Point& drawPointFrom, const Point& drawPointTo)
 {
-	Color paintColor = PALETTE[2];
+	Color paintColor = PALETTE[4];
 	int si = std::min(drawPointFrom.y, drawPointTo.y), gi = std::max(drawPointFrom.y, drawPointTo.y);
 	int sj = std::min(drawPointFrom.x, drawPointTo.x), gj = std::max(drawPointFrom.x, drawPointTo.x);
 	for (int32 i = si * HARF_CELL_CNT + 1; i < (gi + 1) * HARF_CELL_CNT - 1; i++)

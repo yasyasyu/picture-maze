@@ -7,8 +7,9 @@ constexpr Color PALETTE[] = {
 	Palette::Green,
 	Palette::Orange,
 	Palette::Blue,
-	Palette::Hotpink,
-	Palette::Gray
+	Palette::Orchid,
+	Palette::Gray,
+	Palette::Mediumvioletred,
 };
 constexpr Color WALL_COLOR = PALETTE[7];
 
