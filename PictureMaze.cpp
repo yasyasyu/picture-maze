@@ -298,7 +298,10 @@ bool PictureMaze::PrintSpanningTreeButton()
 		180))
 	{
 		this->visualSpanningTreeFlag--;
-		if (this->visualSpanningTreeFlag < 0) this->visualSpanningTreeFlag = 3;
+		if (this->visualSpanningTreeFlag < 0)
+		{
+			this->visualSpanningTreeFlag = 3;
+		}
 	}
 
 	return this->visualSpanningTreeFlag > 0;
@@ -323,45 +326,24 @@ void PictureMaze::PrintSpanningTree(Array<Array<int32>> spanningTree, Color colo
 		{
 			int _frm = frm, _to = to;
 			if (_frm > _to)
+			{
 				std::swap(_frm, _to);
+			}
 
-			Line(
+			Rect::FromPoints(
 				(
 					Point(
 						_frm % FIELD_WIDTH,
 						_frm / FIELD_WIDTH
 					) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 - 1)
-					) * CELL_SIZE + FIELD_OFFSET,
-
+				) * CELL_SIZE + FIELD_OFFSET,
 				(
 					Point(
 						_to % FIELD_WIDTH,
 						_to / FIELD_WIDTH
-					) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 - 1)
-					+ Point(
-						std::abs(_frm % FIELD_WIDTH - _to % FIELD_WIDTH),
-						std::abs(_frm / FIELD_WIDTH - _to / FIELD_WIDTH))
-					) * CELL_SIZE + FIELD_OFFSET
-			).draw(3, color);
-
-			Line(
-				(
-					Point(
-						_frm % FIELD_WIDTH,
-						_frm / FIELD_WIDTH
-					) * CELL_CNT + Point(1, 1) * CELL_CNT / 2
-					- Point(
-						std::abs(_frm % FIELD_WIDTH - _to % FIELD_WIDTH),
-						std::abs(_frm / FIELD_WIDTH - _to / FIELD_WIDTH))
-					) * CELL_SIZE + FIELD_OFFSET,
-
-				(
-					Point(
-						_to % FIELD_WIDTH,
-						_to / FIELD_WIDTH
-					) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2)
-					) * CELL_SIZE + FIELD_OFFSET
-			).draw(3, color);
+					) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 + 1)
+				) * CELL_SIZE + FIELD_OFFSET
+			).draw(color);
 		}
 	}
 }
