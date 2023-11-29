@@ -153,6 +153,7 @@ void OutputSystem::FileSave(PictureMaze& pictureMaze, FilePath folderPath, Strin
 
 	JSON json;
 	json[U"seed"] = pictureMaze.SeedOutput();
+	json[U"seedHash"] = pictureMaze.SeedOutput().hash();
 	Array<Array<bool>> outPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
 	for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
 	{

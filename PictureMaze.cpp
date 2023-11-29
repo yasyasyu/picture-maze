@@ -115,13 +115,13 @@ void PictureMaze::SolveMaze()
 
 bool PictureMaze::ReMaze()
 {
-	if (!this->isRandomSeed && !isRandomizeSeed)
+	if (!this->isRandomSeed && !this->isRandomizeSeed)
 	{
 		return false;
 	}
-	if (isRandomizeSeed)
+	if (this->isRandomizeSeed)
 	{
-		isRandomizeSeed = false;
+		this->isRandomizeSeed = false;
 		return true;
 	}
 	if (SimpleGUI::Button(U"ReMaze",
