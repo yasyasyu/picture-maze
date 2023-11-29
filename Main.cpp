@@ -59,11 +59,12 @@ void Main()
 			// 迷路モード
 			if (application.init() || pictureMaze.ReMaze())
 			{
-				auto [_ansSpanningTree, _spanningTree, start, goal]
+				auto [_ansSpanningTree, _spanningTree, start, goal, ngBorder]
 					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid, pictureMaze.GetSeed());
 				spanningTree = _ansSpanningTree;
 				outSpanningTree = _spanningTree;
 				pictureMaze.SetStartGoal(start, goal);
+				pictureMaze.SetNgBorder(ngBorder);
 				pictureMaze.DrawMaze();
 				application.InitBreak();
 				pictureMaze.TextureFill(AppMode::Maze);
@@ -74,6 +75,7 @@ void Main()
 			{
 				pictureMaze.PrintSpanningTree(spanningTree, pictureMaze.ansSpanningColor);
 				pictureMaze.PrintSpanningTree(outSpanningTree, pictureMaze.outAnsSpanningColor);
+				pictureMaze.PrintNgBorder();
 			}
 
 			pictureMaze.SolveMaze();

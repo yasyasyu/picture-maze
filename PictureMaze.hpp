@@ -43,7 +43,8 @@ private:
 
 	void DrawStartGoal();
 
-
+	// 境界辺
+	Grid< Array<bool>> ngBorder;
 
 	int index = 0;
 	int count = 0;
@@ -109,6 +110,7 @@ public:
 	bool PrintSpanningTreeButton();
 
 	void RandomCheckBox();
+	void SetNgBorder(Grid< Array<bool>>);
 
 	void SeedInputBox(bool isActive);
 	void SeedInput(String);
@@ -120,6 +122,7 @@ public:
 	 * @param[in] (spanningTree) 全域木
 	 */
 	void PrintSpanningTree(Array<Array<int32>> spanningTree, Color color);
+	void PrintNgBorder();
 
 	void DrawMaze();
 

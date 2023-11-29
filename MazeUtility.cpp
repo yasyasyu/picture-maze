@@ -120,7 +120,8 @@ namespace MazeUtillity {
 					Random<int32>(0, ngBorder.size().y - 1)
 				);
 			} while (A == B);
-		} while ((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) < 150);
+
+		} while ((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) < 200);
 
 		if (A.x == B.x)
 		{
@@ -146,6 +147,10 @@ namespace MazeUtillity {
 		}
 		else
 		{
+			if (A.x > B.x)
+			{
+				std::swap(A, B);
+			}
 			HashSet<Point> borders = Bresenham(A, B);
 			HashSet<Point> used;
 			std::queue<Point> que;
@@ -172,11 +177,15 @@ namespace MazeUtillity {
 							if (borders.contains(to))
 							{
 								que.push(to);
-								ngBorder[to.y][to.x][0] = true;
-								if (slant && 0 <= to.x - 1)
-									ngBorder[to.y][to.x - 1][1] = true;
-								if (!slant && to.x + 1 < ngBorder.size().x)
-									ngBorder[to.y][to.x + 1][1] = true;
+								ngBorder[to.y][to.x][1] = true;
+								if (slant && 0 < to.x - 1)
+								{
+									ngBorder[to.y][to.x - 1][0] = true;
+								}
+								else
+								{
+									ngBorder[to.y][to.x][0] = true;
+								}
 								borders.erase(to);
 								used.insert(to);
 							}
@@ -202,7 +211,7 @@ namespace MazeUtillity {
 		}
 	}
 
-	std::tuple< Array<Array<int>>, Array<Array<int>>, DisjointSet<int>, int>
+	std::tuple< Array<Array<int>>, Array<Array<int>>, DisjointSet<int>, int, Grid< Array<bool>>>
 		MakeSpanningTree(const Grid<bool>& grid)
 	{
 		int vertex = grid.size().y * grid.size().x;
@@ -219,6 +228,7 @@ namespace MazeUtillity {
 
 		// 境界辺
 		Grid< Array<bool>> ngBorder(grid.size().y, grid.size().x, Array<bool>(2));
+
 		for (int i = 0; i < grid.size().y; i++)
 		{
 			ngBorder[i][grid.size().x - 1][0] = true;
@@ -228,7 +238,7 @@ namespace MazeUtillity {
 			ngBorder[grid.size().y - 1][j][1] = true;
 		}
 
-		for (int cnt = 0; cnt < 20; cnt++) setNgBorder(ngBorder);
+		for (int cnt = 0; cnt < 10; cnt++) setNgBorder(ngBorder);
 
 		Grid<int> edgeWeight(vertex, vertex, 0);
 		std::priority_queue pq(
@@ -305,7 +315,7 @@ namespace MazeUtillity {
 			spanningTree[v] << v;
 		}
 
-		return { ansSpanningTree, spanningTree, dsu, dsu.find(ans) };
+		return { ansSpanningTree, spanningTree, dsu, dsu.find(ans), ngBorder};
 	}
 
 	/**
@@ -522,7 +532,7 @@ namespace MazeUtillity {
 	 * @param[out] mazeGrid 迷路用のグリッド
 	 * @return Array<Array<int32>> 全域木
 	 */
-	std::tuple<Array<Array<int32>>, Array<Array<int32>>, Point, Point>
+	std::tuple<Array<Array<int32>>, Array<Array<int32>>, Point, Point, Grid< Array<bool>>>
 		CreateMaze(const Grid<bool>& pictureGrid, Grid<int>& mazeGrid, uint64 seed)
 	{
 		Reseed(seed);
@@ -538,7 +548,7 @@ namespace MazeUtillity {
 			}
 		}
 
-		auto [ansSpanningTree, spanningTree, dsu, ans] = MakeSpanningTree(pictureGrid);
+		auto [ansSpanningTree, spanningTree, dsu, ans, ngBorder] = MakeSpanningTree(pictureGrid);
 
 		for (int u = 0; u < ansSpanningTree.size(); u++)
 		{
@@ -562,7 +572,7 @@ namespace MazeUtillity {
 
 		return
 		{
-			ansSpanningTree, spanningTree, start, goal
+			ansSpanningTree, spanningTree, start, goal, ngBorder
 		};
 	}
 
