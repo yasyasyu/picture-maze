@@ -121,7 +121,7 @@ namespace MazeUtillity {
 				);
 			} while (A == B);
 
-		} while ((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) < 200);
+		} while ((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) < 250);
 
 		if (A.x == B.x)
 		{
@@ -533,10 +533,8 @@ namespace MazeUtillity {
 	 * @return Array<Array<int32>> 全域木
 	 */
 	std::tuple<Array<Array<int32>>, Array<Array<int32>>, Point, Point, Grid< Array<bool>>>
-		CreateMaze(const Grid<bool>& pictureGrid, Grid<int>& mazeGrid, uint64 seed)
+		CreateMaze(const Grid<bool>& pictureGrid, Grid<int>& mazeGrid)
 	{
-		Reseed(seed);
-
 		for (int i = 0; i < pictureGrid.size().y; i++)
 		{
 			for (int j = 0; j < pictureGrid.size().x; j++)

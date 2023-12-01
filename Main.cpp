@@ -60,7 +60,7 @@ void Main()
 			if (application.init() || pictureMaze.ReMaze())
 			{
 				auto [_ansSpanningTree, _spanningTree, start, goal, ngBorder]
-					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid, pictureMaze.GetSeed());
+					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid);
 				spanningTree = _ansSpanningTree;
 				outSpanningTree = _spanningTree;
 				pictureMaze.SetStartGoal(start, goal);
@@ -68,7 +68,6 @@ void Main()
 				pictureMaze.DrawMaze();
 				application.InitBreak();
 				pictureMaze.TextureFill(AppMode::Maze);
-				pictureMaze.MazeTerminate();
 				pictureMaze.isExistMaze = true;
 			}
 			if (pictureMaze.PrintSpanningTreeButton())
@@ -108,7 +107,5 @@ void Main()
 		{
 			output.FileOutPut(pictureMaze, true);
 		}
-		pictureMaze.RandomCheckBox();
-		pictureMaze.SeedInputBox(application.mode() == AppMode::Paint);
 	}
 }

@@ -28,8 +28,6 @@ private:
 	int BUTTON_LEFT_PADDING = 30;
 	int BUTTON_PADDING = 20;
 
-
-
 	DynamicTexture texture = DynamicTexture(pictureImage);
 
 	bool spanningTreeView = false;
@@ -38,8 +36,6 @@ private:
 	Array<Point> ansRoute = {};
 
 	void SetRoute(const Array<Point>& route);
-	void SetSeed();
-	void SetSeed(uint64);
 
 	void DrawStartGoal();
 
@@ -52,12 +48,6 @@ private:
 	int overCount = 0;
 
 	int visualSpanningTreeFlag = 0;
-
-	bool isRandomizeSeed = false;
-
-	TextEditState seedText;
-	bool isRandomSeed = true;
-	uint64 seed;
 
 public:
 	Image pictureImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
@@ -74,8 +64,6 @@ public:
 
 	int isExistMaze = false;
 	bool isRoute = false;
-
-	uint64 GetSeed() { return seed; };
 
 	void TextureScaled();
 
@@ -109,12 +97,7 @@ public:
 
 	bool PrintSpanningTreeButton();
 
-	void RandomCheckBox();
 	void SetNgBorder(Grid< Array<bool>>);
-
-	void SeedInputBox(bool isActive);
-	void SeedInput(String);
-	String SeedOutput();
 
 	/**
 	 * @fn 全域木を盤面上に表示。
@@ -140,7 +123,4 @@ public:
 	 * @return bool 迷路モードにするかどうか
 	 */
 	bool ChangeMazeMode();
-
-
-	void MazeTerminate();
 };

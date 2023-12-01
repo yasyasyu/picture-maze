@@ -26,22 +26,10 @@ namespace InputSystem {
 		const JSON json = JSON::Load(loadJsonFile.value());
 		// TODO error処理？
 		// keyの存在、valueのデータ・構造
-		if (not json || !json.hasElement(U"seed") || !json.hasElement(U"picture"))
+		if (not json || !json.hasElement(U"picture"))
 		{
 			System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
 			return;
-		}
-
-		if (!json[U"seed"].isString())
-		{
-			System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
-			return;
-		}
-
-		String seedText = json[U"seed"].getString();
-		if (!seedText.isEmpty())
-		{
-			pictureMaze.SeedInput(seedText);
 		}
 
 		if (!json[U"picture"].isArray())
@@ -152,8 +140,6 @@ void OutputSystem::FileSave(PictureMaze& pictureMaze, FilePath folderPath, Strin
 
 
 	JSON json;
-	json[U"seed"] = pictureMaze.SeedOutput();
-	json[U"seedHash"] = pictureMaze.SeedOutput().hash();
 	Array<Array<bool>> outPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
 	for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
 	{

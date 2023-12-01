@@ -115,15 +115,6 @@ void PictureMaze::SolveMaze()
 
 bool PictureMaze::ReMaze()
 {
-	if (!this->isRandomSeed && !this->isRandomizeSeed)
-	{
-		return false;
-	}
-	if (this->isRandomizeSeed)
-	{
-		this->isRandomizeSeed = false;
-		return true;
-	}
 	if (SimpleGUI::Button(U"ReMaze",
 		Vec2{
 			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
@@ -233,7 +224,9 @@ bool PictureMaze::LoadFile()
 	}
 
 	return false;
-}bool PictureMaze::SaveFile()
+}
+
+bool PictureMaze::SaveFile()
 {
 	if (SimpleGUI::Button(U"Save",
 		Vec2{
@@ -248,6 +241,7 @@ bool PictureMaze::LoadFile()
 
 	return false;
 }
+
 bool PictureMaze::SaveAsOriginFile()
 {
 	if (SimpleGUI::Button(U"Save as",
@@ -585,81 +579,6 @@ void PictureMaze::VisualizeRoute(int isFull)
 			DrawRouteBetweenDot(ansRoute[i - 1], ansRoute[i]);
 	}
 	TextureFill(AppMode::Maze);
-}
-
-
-void PictureMaze::SetSeed()
-{
-	this->seed = Random<uint64>(1000000000);
-}
-
-void PictureMaze::SetSeed(uint64 setSeed)
-{
-	this->seed = setSeed;
-}
-
-void PictureMaze::MazeTerminate()
-{
-	if (this->isRandomSeed)
-	{
-		this->SetSeed();
-	}
-}
-
-void PictureMaze::RandomCheckBox()
-{
-	if (SimpleGUI::CheckBox(this->isRandomSeed, U"ランダム",
-		Vec2{
-			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
-			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 5
-		}
-	))
-	{
-		if (this->isRandomSeed)
-		{
-			this->SetSeed();
-		}
-		else
-		{
-			this->SetSeed(seedText.text.hash());
-		}
-		this->isRandomizeSeed = true;
-	}
-
-}
-
-void PictureMaze::SeedInputBox(bool isActive)
-{
-	if (this->isRandomSeed) return;
-	SimpleGUI::TextBox(this->seedText,
-		Vec2{
-		FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
-			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 4
-	},
-		160, 13, isActive
-	);
-
-	if (seedText.textChanged)
-	{
-		this->SetSeed(seedText.text.hash());
-	}
-
-}
-
-void PictureMaze::SeedInput(String input)
-{
-	this->seedText.text = input;
-	this->isRandomSeed = false;
-}
-
-String PictureMaze::SeedOutput()
-{
-	if (this->isRandomSeed)
-	{
-		return U"";
-	}
-
-	return this->seedText.text;
 }
 
 /**
