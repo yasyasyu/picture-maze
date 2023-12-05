@@ -21,7 +21,7 @@ void Main()
 
 	Point previousMousePoint = Point(-1, -1);
 	OutputSystem output = OutputSystem();
-
+	Reseed((uint64)time(NULL));
 	while (System::Update())
 	{
 		pictureMaze.TextureScaled();
@@ -39,10 +39,16 @@ void Main()
 			}
 
 			if (pictureMaze.DrawDot(MouseL, previousMousePoint))
+			{
 				pictureMaze.TextureFill(AppMode::Paint);
+				pictureMaze.isExistMaze = false;
+			}
 
 			if (pictureMaze.DrawDot(MouseR, previousMousePoint))
+			{
 				pictureMaze.TextureFill(AppMode::Paint);
+				pictureMaze.isExistMaze = false;
+			}
 
 			if (pictureMaze.ChangeMazeMode())
 			{
@@ -56,18 +62,34 @@ void Main()
 
 		case AppMode::Maze:
 			// 迷路モード
-			if (application.init() || pictureMaze.ReMaze())
+			if (application.init())
 			{
-				//if (pictureMaze.isExistMaze)
+				application.InitBreak();
+				if (!pictureMaze.isExistMaze)
+				{
+					auto [ansSpanningTree, spanningTree, start, goal, ngBorder]
+						= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid);
+					pictureMaze.SetSpanningTree(ansSpanningTree, spanningTree);
+					pictureMaze.SetStartGoal(start, goal);
+					pictureMaze.SetNgBorder(ngBorder);
+					pictureMaze.isExistMaze = true;
+				}
+
+				pictureMaze.DrawMaze();
+				pictureMaze.TextureFill(AppMode::Maze);
+			}
+
+			if (pictureMaze.ReMaze())
+			{
 				auto [ansSpanningTree, spanningTree, start, goal, ngBorder]
 					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid);
 				pictureMaze.SetSpanningTree(ansSpanningTree, spanningTree);
 				pictureMaze.SetStartGoal(start, goal);
 				pictureMaze.SetNgBorder(ngBorder);
-				pictureMaze.DrawMaze();
-				application.InitBreak();
-				pictureMaze.TextureFill(AppMode::Maze);
 				pictureMaze.isExistMaze = true;
+
+				pictureMaze.DrawMaze();
+				pictureMaze.TextureFill(AppMode::Maze);
 			}
 
 			if (pictureMaze.PrintSpanningTreeButton())
@@ -82,7 +104,6 @@ void Main()
 			if (pictureMaze.ReturnPaint())
 			{
 				application.ModeChange();
-				pictureMaze.isExistMaze = false;
 				break;
 			}
 			break;

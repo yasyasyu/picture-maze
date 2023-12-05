@@ -6,12 +6,6 @@ void PictureMaze::SetRoute(const Array<Point>& route)
 	this->ansRoute = route;
 }
 
-Array<Point> PictureMaze::GetRoute()
-{
-
-	return this->ansRoute;
-}
-
 Point PictureMaze::WindowSize() const {
 	return Point(
 		CELL_SIZE * FIELD_WIDTH * CELL_CNT + FIELD_OFFSET_LEFT + FIELD_OFFSET_RIGHT,
@@ -285,6 +279,7 @@ void PictureMaze::ResetCanvas()
 			}
 		}
 		TextureFill(AppMode::Paint);
+		this->isExistMaze = false;
 	}
 }
 

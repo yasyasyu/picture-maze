@@ -32,7 +32,6 @@ private:
 
 	bool spanningTreeView = false;
 
-	Point start = Point(0, 0), goal = Point(0, 0);
 	Array<Point> ansRoute = {};
 
 	void DrawStartGoal();
@@ -59,13 +58,11 @@ public:
 	Color ansSpanningColor = PALETTE[3];
 	Color outAnsSpanningColor = PALETTE[6];
 
-	void SetSpanningTree(Array<Array<int32>>, Array<Array<int32>>);
+	void SetSpanningTree(Array<Array<int32>> ans, Array<Array<int32>> out);
 
-	Array<Array<int32>> spanningTree;
-	Array<Array<int32>> ansSpanningTree;
-
+	Array<Array<int32>> spanningTree, ansSpanningTree;
+	Point start = Point(0, 0), goal = Point(0, 0);
 	void SetRoute(const Array<Point>& route);
-	Array<Point> GetRoute();
 
 	bool isExistMaze = false;
 	bool isRoute = false;
@@ -103,7 +100,7 @@ public:
 	bool PrintSpanningTreeButton();
 
 	Grid< Array<bool>> GetNgBorder();
-	void SetNgBorder(Grid< Array<bool>>);
+	void SetNgBorder(Grid<Array<bool>>);
 
 	/**
 	 * @fn 全域木を盤面上に表示。
