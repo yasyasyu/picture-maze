@@ -18,8 +18,7 @@ void Main()
 	// Image Canvas
 
 	pictureMaze.ResetCanvas();
-	Array<Array<int32>> spanningTree;
-	Array<Array<int32>> outSpanningTree;
+
 	Point previousMousePoint = Point(-1, -1);
 	OutputSystem output = OutputSystem();
 
@@ -59,10 +58,10 @@ void Main()
 			// 迷路モード
 			if (application.init() || pictureMaze.ReMaze())
 			{
-				auto [_ansSpanningTree, _spanningTree, start, goal, ngBorder]
+				//if (pictureMaze.isExistMaze)
+				auto [ansSpanningTree, spanningTree, start, goal, ngBorder]
 					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid);
-				spanningTree = _ansSpanningTree;
-				outSpanningTree = _spanningTree;
+				pictureMaze.SetSpanningTree(ansSpanningTree, spanningTree);
 				pictureMaze.SetStartGoal(start, goal);
 				pictureMaze.SetNgBorder(ngBorder);
 				pictureMaze.DrawMaze();
@@ -70,10 +69,10 @@ void Main()
 				pictureMaze.TextureFill(AppMode::Maze);
 				pictureMaze.isExistMaze = true;
 			}
+
 			if (pictureMaze.PrintSpanningTreeButton())
 			{
-				pictureMaze.PrintSpanningTree(spanningTree, pictureMaze.ansSpanningColor);
-				pictureMaze.PrintSpanningTree(outSpanningTree, pictureMaze.outAnsSpanningColor);
+				pictureMaze.PrintSpanningTree();
 				pictureMaze.PrintNgBorder();
 			}
 

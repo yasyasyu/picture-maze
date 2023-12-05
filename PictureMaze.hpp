@@ -35,8 +35,6 @@ private:
 	Point start = Point(0, 0), goal = Point(0, 0);
 	Array<Point> ansRoute = {};
 
-	void SetRoute(const Array<Point>& route);
-
 	void DrawStartGoal();
 
 	// 境界辺
@@ -61,8 +59,15 @@ public:
 	Color ansSpanningColor = PALETTE[3];
 	Color outAnsSpanningColor = PALETTE[6];
 
+	void SetSpanningTree(Array<Array<int32>>, Array<Array<int32>>);
 
-	int isExistMaze = false;
+	Array<Array<int32>> spanningTree;
+	Array<Array<int32>> ansSpanningTree;
+
+	void SetRoute(const Array<Point>& route);
+	Array<Point> GetRoute();
+
+	bool isExistMaze = false;
 	bool isRoute = false;
 
 	void TextureScaled();
@@ -97,6 +102,7 @@ public:
 
 	bool PrintSpanningTreeButton();
 
+	Grid< Array<bool>> GetNgBorder();
 	void SetNgBorder(Grid< Array<bool>>);
 
 	/**
@@ -104,7 +110,7 @@ public:
 	 * @brief 全域木を迷路上に表示する。
 	 * @param[in] (spanningTree) 全域木
 	 */
-	void PrintSpanningTree(Array<Array<int32>> spanningTree, Color color);
+	void PrintSpanningTree();
 	void PrintNgBorder();
 
 	void DrawMaze();

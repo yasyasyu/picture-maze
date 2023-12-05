@@ -114,6 +114,18 @@ void OutputSystem::FileSave(PictureMaze& pictureMaze, FilePath folderPath, Strin
 		return;
 	}
 
+	JSON json;
+	Array<Array<bool>> outPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
+	for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
+	{
+		for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
+		{
+			outPictureGrid[i][j] = pictureMaze.pictureGrid[i][j];
+		}
+	}
+
+	json[U"picture"] = outPictureGrid;
+
 	{// picture
 		pictureMaze.pictureImage.save(
 			FileSystem::PathAppend(folderPath, fileName + DefaultFileName::PictureImageSuffix()), ImageFormat::PNG
@@ -127,29 +139,23 @@ void OutputSystem::FileSave(PictureMaze& pictureMaze, FilePath folderPath, Strin
 		pictureMaze.mazeImage.save(
 			FileSystem::PathAppend(folderPath, fileName + DefaultFileName::AnsImageSuffix()), ImageFormat::PNG
 		);
+		json[U"route"] = pictureMaze.GetRoute();
 	}
 
 	if (pictureMaze.isExistMaze)
 	{
 		// maze
+		
 		pictureMaze.VisualizeRoute(1);
 		pictureMaze.mazeImage.save(
 			FileSystem::PathAppend(folderPath, fileName + DefaultFileName::MazeImageSuffix()), ImageFormat::PNG
 		);
+		json[U"maze"] = pictureMaze.mazeGrid;
+		json[U"spanningTree"] = pictureMaze.spanningTree;
+		json[U"ansSpanningTree"] = pictureMaze.ansSpanningTree;
+		json[U"NgBorder"] = pictureMaze.GetNgBorder();
 	}
 
-
-	JSON json;
-	Array<Array<bool>> outPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
-	for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
-	{
-		for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
-		{
-			outPictureGrid[i][j] = pictureMaze.pictureGrid[i][j];
-		}
-	}
-
-	json[U"picture"] = outPictureGrid;
 	json.saveMinimum(
 		FileSystem::PathAppend(folderPath, fileName + DefaultFileName::InfoJsonSuffix())
 	);

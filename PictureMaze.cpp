@@ -6,6 +6,12 @@ void PictureMaze::SetRoute(const Array<Point>& route)
 	this->ansRoute = route;
 }
 
+Array<Point> PictureMaze::GetRoute()
+{
+
+	return this->ansRoute;
+}
+
 Point PictureMaze::WindowSize() const {
 	return Point(
 		CELL_SIZE * FIELD_WIDTH * CELL_CNT + FIELD_OFFSET_LEFT + FIELD_OFFSET_RIGHT,
@@ -300,44 +306,54 @@ bool PictureMaze::PrintSpanningTreeButton()
 
 	return this->visualSpanningTreeFlag > 0;
 }
-
+void PictureMaze::SetSpanningTree(Array<Array<int32>> ansSpanningTree, Array<Array<int32>> spanningTree)
+{
+	this->ansSpanningTree = ansSpanningTree;
+	this->spanningTree = spanningTree;
+}
 /**
 	* @fn 全域木を盤面上に表示。
 	* @brief 全域木を迷路上に表示する。
 	* @param[in] (spanningTree) 全域木
 	*/
-void PictureMaze::PrintSpanningTree(Array<Array<int32>> spanningTree, Color color)
+void PictureMaze::PrintSpanningTree()
 {
-	if (
-		(this->visualSpanningTreeFlag & 2) == 0 && color == this->ansSpanningColor ||
-		(this->visualSpanningTreeFlag & 1) == 0 && color == this->outAnsSpanningColor
-	)	return;
-
-	const ScopedRenderStates2D sampler{ SamplerState::ClampNearest };
-	for (int frm = 0; frm < spanningTree.size(); frm++)
+	for (int spanningTreeNum = 0; spanningTreeNum < 2; spanningTreeNum++)
 	{
-		for (auto to : spanningTree[frm])
+		if ((this->visualSpanningTreeFlag & 1 << spanningTreeNum) == 0)
 		{
-			int _frm = frm, _to = to;
-			if (_frm > _to)
-			{
-				std::swap(_frm, _to);
-			}
+			continue;
+		}
 
-			Rect::FromPoints(
-				(
-					Point(
-						_frm % FIELD_WIDTH,
-						_frm / FIELD_WIDTH
-					) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 - 1)
-				) * CELL_SIZE + FIELD_OFFSET,
-				(
-					Point(
-						_to % FIELD_WIDTH,
-						_to / FIELD_WIDTH
-					) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 + 1)
-				) * CELL_SIZE + FIELD_OFFSET
-			).draw(color);
+		Array<Array<int32>> spanningTree = (spanningTreeNum == 0) ? this->ansSpanningTree : this->spanningTree;
+		Color color = (spanningTreeNum == 0) ? this->ansSpanningColor : this->outAnsSpanningColor;
+
+		const ScopedRenderStates2D sampler{ SamplerState::ClampNearest };
+		for (int frm = 0; frm < spanningTree.size(); frm++)
+		{
+			for (auto to : spanningTree[frm])
+			{
+				int _frm = frm, _to = to;
+				if (_frm > _to)
+				{
+					std::swap(_frm, _to);
+				}
+
+				Rect::FromPoints(
+					(
+						Point(
+							_frm % FIELD_WIDTH,
+							_frm / FIELD_WIDTH
+						) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 - 1)
+					) * CELL_SIZE + FIELD_OFFSET,
+					(
+						Point(
+							_to % FIELD_WIDTH,
+							_to / FIELD_WIDTH
+						) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 + 1)
+					) * CELL_SIZE + FIELD_OFFSET
+				).draw(color);
+			}
 		}
 	}
 }
@@ -347,8 +363,17 @@ void PictureMaze::SetNgBorder(Grid< Array<bool>> ngBorder)
 	this->ngBorder = ngBorder;
 }
 
+Grid< Array<bool>> PictureMaze::GetNgBorder()
+{
+	return this->ngBorder;
+}
+
 void PictureMaze::PrintNgBorder()
 {
+	if ((this->visualSpanningTreeFlag & (1 << 2)) == 0)
+	{
+		return;
+	}
 	for (int i = 0; i < this->ngBorder.size().y; i++)
 	{
 		for (int j = 0; j < this->ngBorder.size().x; j++)
