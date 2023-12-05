@@ -115,15 +115,6 @@ void PictureMaze::SolveMaze()
 
 bool PictureMaze::ReMaze()
 {
-	if (!this->isRandomSeed && !isRandomizeSeed)
-	{
-		return false;
-	}
-	if (isRandomizeSeed)
-	{
-		isRandomizeSeed = false;
-		return true;
-	}
 	if (SimpleGUI::Button(U"ReMaze",
 		Vec2{
 			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
@@ -233,7 +224,9 @@ bool PictureMaze::LoadFile()
 	}
 
 	return false;
-}bool PictureMaze::SaveFile()
+}
+
+bool PictureMaze::SaveFile()
 {
 	if (SimpleGUI::Button(U"Save",
 		Vec2{
@@ -248,6 +241,7 @@ bool PictureMaze::LoadFile()
 
 	return false;
 }
+
 bool PictureMaze::SaveAsOriginFile()
 {
 	if (SimpleGUI::Button(U"Save as",
@@ -285,6 +279,7 @@ void PictureMaze::ResetCanvas()
 			}
 		}
 		TextureFill(AppMode::Paint);
+		this->isExistMaze = false;
 	}
 }
 
@@ -306,44 +301,54 @@ bool PictureMaze::PrintSpanningTreeButton()
 
 	return this->visualSpanningTreeFlag > 0;
 }
-
+void PictureMaze::SetSpanningTree(Array<Array<int32>> ansSpanningTree, Array<Array<int32>> spanningTree)
+{
+	this->ansSpanningTree = ansSpanningTree;
+	this->spanningTree = spanningTree;
+}
 /**
 	* @fn 全域木を盤面上に表示。
 	* @brief 全域木を迷路上に表示する。
 	* @param[in] (spanningTree) 全域木
 	*/
-void PictureMaze::PrintSpanningTree(Array<Array<int32>> spanningTree, Color color)
+void PictureMaze::PrintSpanningTree()
 {
-	if (
-		(this->visualSpanningTreeFlag & 2) == 0 && color == this->ansSpanningColor ||
-		(this->visualSpanningTreeFlag & 1) == 0 && color == this->outAnsSpanningColor
-	)	return;
-
-	const ScopedRenderStates2D sampler{ SamplerState::ClampNearest };
-	for (int frm = 0; frm < spanningTree.size(); frm++)
+	for (int spanningTreeNum = 0; spanningTreeNum < 2; spanningTreeNum++)
 	{
-		for (auto to : spanningTree[frm])
+		if ((this->visualSpanningTreeFlag & 1 << spanningTreeNum) == 0)
 		{
-			int _frm = frm, _to = to;
-			if (_frm > _to)
-			{
-				std::swap(_frm, _to);
-			}
+			continue;
+		}
 
-			Rect::FromPoints(
-				(
-					Point(
-						_frm % FIELD_WIDTH,
-						_frm / FIELD_WIDTH
-					) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 - 1)
-				) * CELL_SIZE + FIELD_OFFSET,
-				(
-					Point(
-						_to % FIELD_WIDTH,
-						_to / FIELD_WIDTH
-					) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 + 1)
-				) * CELL_SIZE + FIELD_OFFSET
-			).draw(color);
+		Array<Array<int32>> spanningTree = (spanningTreeNum == 0) ? this->ansSpanningTree : this->spanningTree;
+		Color color = (spanningTreeNum == 0) ? this->ansSpanningColor : this->outAnsSpanningColor;
+
+		const ScopedRenderStates2D sampler{ SamplerState::ClampNearest };
+		for (int frm = 0; frm < spanningTree.size(); frm++)
+		{
+			for (auto to : spanningTree[frm])
+			{
+				int _frm = frm, _to = to;
+				if (_frm > _to)
+				{
+					std::swap(_frm, _to);
+				}
+
+				Rect::FromPoints(
+					(
+						Point(
+							_frm % FIELD_WIDTH,
+							_frm / FIELD_WIDTH
+						) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 - 1)
+					) * CELL_SIZE + FIELD_OFFSET,
+					(
+						Point(
+							_to % FIELD_WIDTH,
+							_to / FIELD_WIDTH
+						) * CELL_CNT + Point(1, 1) * (CELL_CNT / 2 + 1)
+					) * CELL_SIZE + FIELD_OFFSET
+				).draw(color);
+			}
 		}
 	}
 }
@@ -353,8 +358,17 @@ void PictureMaze::SetNgBorder(Grid< Array<bool>> ngBorder)
 	this->ngBorder = ngBorder;
 }
 
+Grid< Array<bool>> PictureMaze::GetNgBorder()
+{
+	return this->ngBorder;
+}
+
 void PictureMaze::PrintNgBorder()
 {
+	if ((this->visualSpanningTreeFlag & (1 << 2)) == 0)
+	{
+		return;
+	}
 	for (int i = 0; i < this->ngBorder.size().y; i++)
 	{
 		for (int j = 0; j < this->ngBorder.size().x; j++)
@@ -585,81 +599,6 @@ void PictureMaze::VisualizeRoute(int isFull)
 			DrawRouteBetweenDot(ansRoute[i - 1], ansRoute[i]);
 	}
 	TextureFill(AppMode::Maze);
-}
-
-
-void PictureMaze::SetSeed()
-{
-	this->seed = Random<uint64>(1000000000);
-}
-
-void PictureMaze::SetSeed(uint64 setSeed)
-{
-	this->seed = setSeed;
-}
-
-void PictureMaze::MazeTerminate()
-{
-	if (this->isRandomSeed)
-	{
-		this->SetSeed();
-	}
-}
-
-void PictureMaze::RandomCheckBox()
-{
-	if (SimpleGUI::CheckBox(this->isRandomSeed, U"ランダム",
-		Vec2{
-			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
-			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 5
-		}
-	))
-	{
-		if (this->isRandomSeed)
-		{
-			this->SetSeed();
-		}
-		else
-		{
-			this->SetSeed(seedText.text.hash());
-		}
-		this->isRandomizeSeed = true;
-	}
-
-}
-
-void PictureMaze::SeedInputBox(bool isActive)
-{
-	if (this->isRandomSeed) return;
-	SimpleGUI::TextBox(this->seedText,
-		Vec2{
-		FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
-			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 4
-	},
-		160, 13, isActive
-	);
-
-	if (seedText.textChanged)
-	{
-		this->SetSeed(seedText.text.hash());
-	}
-
-}
-
-void PictureMaze::SeedInput(String input)
-{
-	this->seedText.text = input;
-	this->isRandomSeed = false;
-}
-
-String PictureMaze::SeedOutput()
-{
-	if (this->isRandomSeed)
-	{
-		return U"";
-	}
-
-	return this->seedText.text;
 }
 
 /**

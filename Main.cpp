@@ -18,11 +18,10 @@ void Main()
 	// Image Canvas
 
 	pictureMaze.ResetCanvas();
-	Array<Array<int32>> spanningTree;
-	Array<Array<int32>> outSpanningTree;
+
 	Point previousMousePoint = Point(-1, -1);
 	OutputSystem output = OutputSystem();
-
+	Reseed((uint64)time(NULL));
 	while (System::Update())
 	{
 		pictureMaze.TextureScaled();
@@ -40,10 +39,16 @@ void Main()
 			}
 
 			if (pictureMaze.DrawDot(MouseL, previousMousePoint))
+			{
 				pictureMaze.TextureFill(AppMode::Paint);
+				pictureMaze.isExistMaze = false;
+			}
 
 			if (pictureMaze.DrawDot(MouseR, previousMousePoint))
+			{
 				pictureMaze.TextureFill(AppMode::Paint);
+				pictureMaze.isExistMaze = false;
+			}
 
 			if (pictureMaze.ChangeMazeMode())
 			{
@@ -57,24 +62,39 @@ void Main()
 
 		case AppMode::Maze:
 			// 迷路モード
-			if (application.init() || pictureMaze.ReMaze())
+			if (application.init())
 			{
-				auto [_ansSpanningTree, _spanningTree, start, goal, ngBorder]
-					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid, pictureMaze.GetSeed());
-				spanningTree = _ansSpanningTree;
-				outSpanningTree = _spanningTree;
+				application.InitBreak();
+				if (!pictureMaze.isExistMaze)
+				{
+					auto [ansSpanningTree, spanningTree, start, goal, ngBorder]
+						= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid);
+					pictureMaze.SetSpanningTree(ansSpanningTree, spanningTree);
+					pictureMaze.SetStartGoal(start, goal);
+					pictureMaze.SetNgBorder(ngBorder);
+					pictureMaze.isExistMaze = true;
+				}
+
+				pictureMaze.DrawMaze();
+				pictureMaze.TextureFill(AppMode::Maze);
+			}
+
+			if (pictureMaze.ReMaze())
+			{
+				auto [ansSpanningTree, spanningTree, start, goal, ngBorder]
+					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid);
+				pictureMaze.SetSpanningTree(ansSpanningTree, spanningTree);
 				pictureMaze.SetStartGoal(start, goal);
 				pictureMaze.SetNgBorder(ngBorder);
-				pictureMaze.DrawMaze();
-				application.InitBreak();
-				pictureMaze.TextureFill(AppMode::Maze);
-				pictureMaze.MazeTerminate();
 				pictureMaze.isExistMaze = true;
+
+				pictureMaze.DrawMaze();
+				pictureMaze.TextureFill(AppMode::Maze);
 			}
+
 			if (pictureMaze.PrintSpanningTreeButton())
 			{
-				pictureMaze.PrintSpanningTree(spanningTree, pictureMaze.ansSpanningColor);
-				pictureMaze.PrintSpanningTree(outSpanningTree, pictureMaze.outAnsSpanningColor);
+				pictureMaze.PrintSpanningTree();
 				pictureMaze.PrintNgBorder();
 			}
 
@@ -84,7 +104,6 @@ void Main()
 			if (pictureMaze.ReturnPaint())
 			{
 				application.ModeChange();
-				pictureMaze.isExistMaze = false;
 				break;
 			}
 			break;
@@ -108,7 +127,5 @@ void Main()
 		{
 			output.FileOutPut(pictureMaze, true);
 		}
-		pictureMaze.RandomCheckBox();
-		pictureMaze.SeedInputBox(application.mode() == AppMode::Paint);
 	}
 }

@@ -24,61 +24,202 @@ namespace InputSystem {
 			return;
 		}
 		const JSON json = JSON::Load(loadJsonFile.value());
-		// TODO error処理？
-		// keyの存在、valueのデータ・構造
-		if (not json || !json.hasElement(U"seed") || !json.hasElement(U"picture"))
+		if (not json || !json.hasElement(U"picture"))
 		{
 			System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
 			return;
 		}
 
-		if (!json[U"seed"].isString())
-		{
-			System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
-			return;
-		}
-
-		String seedText = json[U"seed"].getString();
-		if (!seedText.isEmpty())
-		{
-			pictureMaze.SeedInput(seedText);
-		}
-
+		// picture
 		if (!json[U"picture"].isArray())
 		{
 			System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
 			return;
 		}
-
-		auto loadGrid = json[U"picture"].arrayView();
-		Array<Array<bool>> loadPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
-		for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
+		// picture
 		{
-			if (!loadGrid[i].isArray())
+			auto loadGrid = json[U"picture"].arrayView();
+			Array<Array<bool>> loadPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
+			for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
 			{
-				System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
-				return;
-			}
-
-			auto row = loadGrid[i].arrayView();
-			for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
-			{
-				if (!row[j].isBool())
+				if (!loadGrid[i].isArray())
 				{
 					System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
 					return;
 				}
 
-				loadPictureGrid[i][j] = row[j].get<bool>();
+				auto row = loadGrid[i].arrayView();
+				for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
+				{
+					if (!row[j].isBool())
+					{
+						System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+						return;
+					}
+
+					loadPictureGrid[i][j] = row[j].get<bool>();
+				}
+			}
+
+			for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
+			{
+				for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
+				{
+					pictureMaze.pictureGrid[i][j] = loadPictureGrid[i][j];
+					pictureMaze.UpdateDot(Point(j, i), (loadPictureGrid[i][j] ? PALETTE[1] : PALETTE[0]));
+				}
 			}
 		}
 
-		for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
+		// around maze
+		if (json.hasElement(U"maze"))
 		{
-			for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
+			pictureMaze.isExistMaze = true;
+			// maze
 			{
-				pictureMaze.pictureGrid[i][j] = loadPictureGrid[i][j];
-				pictureMaze.UpdateDot(Point(j, i), (loadPictureGrid[i][j] ? PALETTE[1] : PALETTE[0]));
+				if (!json[U"maze"].isArray())
+				{
+					System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+					return;
+				}
+				auto loadGrid = json[U"maze"].arrayView();
+
+				Grid<int> loadMazeGrid(pictureMaze.mazeGrid.size().y, pictureMaze.mazeGrid.size().x, 0);
+				for (int i = 0; i < pictureMaze.mazeGrid.size().y; i++)
+				{
+					if (!loadGrid[i].isArray())
+					{
+						System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+						return;
+					}
+
+					auto row = loadGrid[i].arrayView();
+					for (int j = 0; j < pictureMaze.mazeGrid.size().x; j++)
+					{
+						if(!row[j].isInteger())
+						{
+							System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+							return;
+						}
+
+						loadMazeGrid[i][j] = row[j].get<int>();
+					}
+				}
+
+				pictureMaze.mazeGrid = loadMazeGrid;
+			}
+
+			// NgBorder
+			{
+				if (!json.hasElement(U"NgBorder"))
+				{
+					System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+					return;
+				}
+
+				const JSON loadGrid = json[U"NgBorder"];
+				Grid<Array<bool>> loadNgBorder(pictureMaze.pictureGrid.size().y, pictureMaze.pictureGrid.size().x, Array<bool>(2));
+				for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
+				{
+					if (!loadGrid[i].isArray())
+					{
+						System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+						return;
+					}
+
+					const JSON row = loadGrid[i];
+					for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
+					{
+						if (!row[j].isArray())
+						{
+							System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+							return;
+						}
+						const JSON cell = row[j];
+						for (int k = 0; k < 2; k++)
+						{
+							if (!cell[k].isBool())
+							{
+								System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+								return;
+							}
+
+							loadNgBorder[i][j][k] = cell[k].get<bool>();
+						}
+					}
+				}
+
+				pictureMaze.SetNgBorder(loadNgBorder);
+			}
+
+			// spanningTree
+			{
+				int vertex = pictureMaze.pictureGrid.size().y * pictureMaze.pictureGrid.size().x;
+				Array<Array<int32>> loadSpanningTree(vertex);
+				Array<Array<int32>> loadAnsSpanningTree(vertex);
+
+				{ // ans
+					if (!json.hasElement(U"spanningTree"))
+					{
+						System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+						return;
+					}
+					const JSON loadGrid = json[U"spanningTree"];
+					for (int i = 0; i < vertex; i++)
+					{
+						if (!loadGrid[i].isArray())
+						{
+							System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+							return;
+						}
+						const JSON row = loadGrid[i];
+
+						for (int j = 0; j < row.size(); j++)
+						{
+							loadAnsSpanningTree[i] << row[j].get<int>();
+						}
+					}
+				}
+
+				{ // outs
+					if (!json.hasElement(U"ansSpanningTree"))
+					{
+						System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+						return;
+					}
+					const JSON loadGrid = json[U"ansSpanningTree"];
+					for (int i = 0; i < vertex; i++)
+					{
+						if (!loadGrid[i].isArray())
+						{
+							System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+							return;
+						}
+						const JSON row = loadGrid[i];
+
+						for (int j = 0; j < row.size(); j++)
+						{
+							loadSpanningTree[i] << row[j].get<int>();
+						}
+					}
+				}
+
+				pictureMaze.SetSpanningTree(loadAnsSpanningTree, loadSpanningTree);
+			}
+
+			// start, goal
+			{
+				{ // start
+					if (!json.hasElement(U"start") || !json.hasElement(U"goal"))
+					{
+						System::MessageBoxOK(U"JSON ParseError", U"不正なファイルです。", MessageBoxStyle::Error);
+						return;
+					}
+					
+					Point start = json[U"start"].get<Point>();
+					Point goal = json[U"goal"].get<Point>();
+					pictureMaze.SetStartGoal(start, goal);
+				}
 			}
 		}
 	}
@@ -126,6 +267,18 @@ void OutputSystem::FileSave(PictureMaze& pictureMaze, FilePath folderPath, Strin
 		return;
 	}
 
+	JSON json;
+	Array<Array<bool>> outPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
+	for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
+	{
+		for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
+		{
+			outPictureGrid[i][j] = pictureMaze.pictureGrid[i][j];
+		}
+	}
+
+	json[U"picture"] = outPictureGrid;
+
 	{// picture
 		pictureMaze.pictureImage.save(
 			FileSystem::PathAppend(folderPath, fileName + DefaultFileName::PictureImageSuffix()), ImageFormat::PNG
@@ -148,21 +301,46 @@ void OutputSystem::FileSave(PictureMaze& pictureMaze, FilePath folderPath, Strin
 		pictureMaze.mazeImage.save(
 			FileSystem::PathAppend(folderPath, fileName + DefaultFileName::MazeImageSuffix()), ImageFormat::PNG
 		);
-	}
 
 
-	JSON json;
-	json[U"seed"] = pictureMaze.SeedOutput();
-	Array<Array<bool>> outPictureGrid(pictureMaze.pictureGrid.size().y, Array<bool>(pictureMaze.pictureGrid.size().x, false));
-	for (int i = 0; i < pictureMaze.pictureGrid.size().y; i++)
-	{
-		for (int j = 0; j < pictureMaze.pictureGrid.size().x; j++)
+
+		Grid<int> mazeGrid = pictureMaze.mazeGrid;
+		Array <Array<int>> mazeArray(mazeGrid.size().y, Array<int>(mazeGrid.size().x, 0));
+		for (int i = 0; i <mazeGrid.size().y; i++)
 		{
-			outPictureGrid[i][j] = pictureMaze.pictureGrid[i][j];
+			for (int j = 0; j < mazeGrid.size().x; j++)
+			{
+				mazeArray[i][j] = mazeGrid[i][j];
+			}
 		}
+		json[U"maze"] = mazeArray;
+
+		Grid <Array< bool >> ngBorderGrid = pictureMaze.GetNgBorder();
+		Array<Array < Array< bool >>> ngBorder(
+			ngBorderGrid.size().y,
+			Array<Array<bool>>(ngBorderGrid.size().x,
+				Array<bool>(2, false)
+			)
+		);
+		for (int i = 0; i < ngBorderGrid.size().y; i++)
+		{
+			for (int j = 0; j < ngBorderGrid.size().x; j++)
+			{
+				for (int k = 0; k < 2; k++)
+				{
+					ngBorder[i][j][k] = ngBorderGrid[i][j][k];
+				}
+			}
+		}
+		json[U"NgBorder"] = ngBorder;
+
+		json[U"spanningTree"] = pictureMaze.spanningTree;
+		json[U"ansSpanningTree"] = pictureMaze.ansSpanningTree;
+
+		json[U"start"] = pictureMaze.start;
+		json[U"goal"] = pictureMaze.goal;
 	}
 
-	json[U"picture"] = outPictureGrid;
 	json.saveMinimum(
 		FileSystem::PathAppend(folderPath, fileName + DefaultFileName::InfoJsonSuffix())
 	);

@@ -28,18 +28,11 @@ private:
 	int BUTTON_LEFT_PADDING = 30;
 	int BUTTON_PADDING = 20;
 
-
-
 	DynamicTexture texture = DynamicTexture(pictureImage);
 
 	bool spanningTreeView = false;
 
-	Point start = Point(0, 0), goal = Point(0, 0);
 	Array<Point> ansRoute = {};
-
-	void SetRoute(const Array<Point>& route);
-	void SetSeed();
-	void SetSeed(uint64);
 
 	void DrawStartGoal();
 
@@ -53,12 +46,6 @@ private:
 
 	int visualSpanningTreeFlag = 0;
 
-	bool isRandomizeSeed = false;
-
-	TextEditState seedText;
-	bool isRandomSeed = true;
-	uint64 seed;
-
 public:
 	Image pictureImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
 	Image mazeImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
@@ -71,11 +58,14 @@ public:
 	Color ansSpanningColor = PALETTE[3];
 	Color outAnsSpanningColor = PALETTE[6];
 
+	void SetSpanningTree(Array<Array<int32>> ans, Array<Array<int32>> out);
 
-	int isExistMaze = false;
+	Array<Array<int32>> spanningTree, ansSpanningTree;
+	Point start = Point(0, 0), goal = Point(0, 0);
+	void SetRoute(const Array<Point>& route);
+
+	bool isExistMaze = false;
 	bool isRoute = false;
-
-	uint64 GetSeed() { return seed; };
 
 	void TextureScaled();
 
@@ -109,19 +99,15 @@ public:
 
 	bool PrintSpanningTreeButton();
 
-	void RandomCheckBox();
-	void SetNgBorder(Grid< Array<bool>>);
-
-	void SeedInputBox(bool isActive);
-	void SeedInput(String);
-	String SeedOutput();
+	Grid< Array<bool>> GetNgBorder();
+	void SetNgBorder(Grid<Array<bool>>);
 
 	/**
 	 * @fn 全域木を盤面上に表示。
 	 * @brief 全域木を迷路上に表示する。
 	 * @param[in] (spanningTree) 全域木
 	 */
-	void PrintSpanningTree(Array<Array<int32>> spanningTree, Color color);
+	void PrintSpanningTree();
 	void PrintNgBorder();
 
 	void DrawMaze();
@@ -140,7 +126,4 @@ public:
 	 * @return bool 迷路モードにするかどうか
 	 */
 	bool ChangeMazeMode();
-
-
-	void MazeTerminate();
 };

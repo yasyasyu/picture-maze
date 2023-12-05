@@ -44,7 +44,7 @@ namespace MazeUtillity {
 	 * @return Array<Array<int32>> 全域木
 	 */
 	std::tuple<Array<Array<int32>>, Array<Array<int32>>, Point, Point, Grid< Array<bool>>>
-		CreateMaze(const Grid<bool>& pictureGrid, Grid<int>& mazeGrid, uint64 seed);
+		CreateMaze(const Grid<bool>& pictureGrid, Grid<int>& mazeGrid);
 
 	Array<Point> Solve(Grid<int>& mazeGrid, Point start, Point goal);
 }
