@@ -176,7 +176,7 @@ namespace InputSystem {
 
 						for (int j = 0; j < row.size(); j++)
 						{
-							loadAnsSpanningTree[i] << row[j].get<int>();
+							loadSpanningTree[i] << row[j].get<int>();
 						}
 					}
 				}
@@ -199,7 +199,7 @@ namespace InputSystem {
 
 						for (int j = 0; j < row.size(); j++)
 						{
-							loadSpanningTree[i] << row[j].get<int>();
+							loadAnsSpanningTree[i] << row[j].get<int>();
 						}
 					}
 				}
