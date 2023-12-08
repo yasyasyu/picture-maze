@@ -217,7 +217,7 @@ namespace MazeUtillity {
 		int vertex = grid.size().y * grid.size().x;
 
 		int D[] = { 0, 1, 0, -1, 0 };
-		Grid<int> graph(grid.size().y, grid.size().x);
+		Grid<int> graph(grid.size());
 		for (int i = 0; i < grid.size().y; i++)
 		{
 			for (int j = 0; j < grid.size().x; j++)
@@ -227,7 +227,7 @@ namespace MazeUtillity {
 		}
 
 		// 境界辺
-		Grid< Array<bool>> ngBorder(grid.size().y, grid.size().x, Array<bool>(2));
+		Grid< Array<bool>> ngBorder(grid.size(), Array<bool>(2));
 
 		for (int i = 0; i < grid.size().y; i++)
 		{
