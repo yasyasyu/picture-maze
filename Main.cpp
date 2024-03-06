@@ -38,16 +38,21 @@ void Main()
 				previousMousePoint = Point(-1, -1);
 			}
 
-			if (pictureMaze.DrawDot(MouseL, previousMousePoint))
+			if (pictureMaze.DrawDot(MouseL, previousMousePoint, application.isReverse()))
 			{
 				pictureMaze.TextureFill(AppMode::Paint);
 				pictureMaze.isExistMaze = false;
 			}
 
-			if (pictureMaze.DrawDot(MouseR, previousMousePoint))
+			if (pictureMaze.DrawDot(MouseR, previousMousePoint, application.isReverse()))
 			{
 				pictureMaze.TextureFill(AppMode::Paint);
 				pictureMaze.isExistMaze = false;
+			}
+
+			if (pictureMaze.MouseReverse(application.isReverse()))
+			{
+				application.MouseReverse();
 			}
 
 			if (pictureMaze.ChangeMazeMode())

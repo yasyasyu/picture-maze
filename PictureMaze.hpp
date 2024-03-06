@@ -89,11 +89,13 @@ public:
 	bool ReMaze();
 
 	void UpdateDot(Point target, Color color);
-	bool DrawDot(const Input& mouse, Point& previousMousePoint);
+	bool DrawDot(const Input& mouse, Point& previousMousePoint, bool isReverse);
 
 	bool LoadFile();
 	bool SaveFile();
 	bool SaveAsOriginFile();
+
+	bool MouseReverse(bool isReverseMouse);
 
 	void ResetCanvas();
 
