@@ -46,6 +46,9 @@ private:
 
 	int visualSpanningTreeFlag = 0;
 
+	Font parentFolderFont{ FontMethod::MSDF,48 };
+	Rect parentFolderRect;
+
 public:
 	Image pictureImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
 	Image mazeImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);

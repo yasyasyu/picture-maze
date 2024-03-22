@@ -660,20 +660,21 @@ bool PictureMaze::ChangeMazeMode()
 
 void PictureMaze::ParentFolderText(Optional<String> parentFolder)
 {
-	Font parentFolderFont{ FontMethod::MSDF,48};
-	Rect parentFolderRect = Rect(
+	this->parentFolderRect = Rect(
 		FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
-		FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 5 ,
-		20,200
+		FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 9 - 10 ,
+		150,42
 	);
+
+	this->parentFolderRect.draw();
+	this->parentFolderRect.drawFrame(0.4, Palette::Black);
 
 	if (parentFolder.has_value())
 	{
-		parentFolderRect.draw();
-		parentFolderFont(parentFolder.value()).draw(
-			12,
-			parentFolderRect.stretched(-10),
-			ColorF{ 0.11 }
+		this->parentFolderFont(parentFolder.value()).draw(
+			9,
+			this->parentFolderRect.stretched(-1),
+			ColorF{ 0 }
 		);
 	}
 
