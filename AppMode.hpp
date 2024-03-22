@@ -9,7 +9,8 @@ constexpr Color PALETTE[] = {
 	Palette::Blue,
 	Palette::Orchid,
 	Palette::Gray,
-	Palette::Mediumvioletred,
+	Palette::Lightblue,
+	Palette::Limegreen
 };
 constexpr Color WALL_COLOR = PALETTE[7];
 

@@ -58,7 +58,7 @@ public:
 
 	Point WindowSize() const;
 
-	Color ansSpanningColor = PALETTE[3];
+	Color ansSpanningColor = PALETTE[9];
 	Color outAnsSpanningColor = PALETTE[6];
 
 	void SetSpanningTree(Array<Array<int32>> ans, Array<Array<int32>> out);
