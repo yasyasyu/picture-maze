@@ -11,11 +11,12 @@ namespace InputSystem
 class OutputSystem
 {
 private:
-	Optional<FilePath> parentFolder;
 	String defaultFileName;
 
 public:
 	OutputSystem();
+
+	Optional<FilePath> parentFolder;
 
 	bool ParentFolderSelect();
 

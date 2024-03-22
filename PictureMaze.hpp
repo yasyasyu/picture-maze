@@ -95,6 +95,8 @@ public:
 	bool SaveFile();
 	bool SaveAsOriginFile();
 
+	void ParentFolderText(Optional<String> parentFolder);
+
 	void ResetCanvas();
 
 	bool PrintSpanningTreeButton();

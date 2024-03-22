@@ -16,7 +16,6 @@ void Main()
 	const ScopedRenderStates2D sampler{ SamplerState::ClampNearest };
 
 	// Image Canvas
-
 	pictureMaze.ResetCanvas();
 
 	Point previousMousePoint = Point(-1, -1);
@@ -118,11 +117,13 @@ void Main()
 			application.ModeChange(AppMode::Paint);
 		}
 
+		pictureMaze.ParentFolderText(output.parentFolder);
+
 		if (pictureMaze.SaveFile())
 		{
 			output.FileOutPut(pictureMaze);
 		}
-
+		
 		if (pictureMaze.SaveAsOriginFile())
 		{
 			output.FileOutPut(pictureMaze, true);
