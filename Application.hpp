@@ -6,6 +6,7 @@ class Application
 private:
 	AppMode applicationMode;
 	bool _init;
+	bool _mouseReverse;
 public:
 	Application();
 
@@ -17,4 +18,6 @@ public:
 	bool init();
 
 	void InitBreak();
+	void MouseReverse();
+	bool isReverse();
 };

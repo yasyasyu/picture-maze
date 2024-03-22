@@ -138,14 +138,14 @@ void PictureMaze::UpdateDot(Point target, Color color)
 	}
 }
 
-bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint)
+bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint, bool isReverse)
 {
 	Point nowPoint = (Cursor::Pos() - FIELD_OFFSET) / (CELL_SIZE * CELL_CNT);
 	if ((mouse.pressed() &&
 		!(
 			0 <= nowPoint.x && nowPoint.x < FIELD_WIDTH &&
 			0 <= nowPoint.y && nowPoint.y < FIELD_HEIGHT
-			)) || mouse.up()
+		)) || mouse.up()
 		)
 	{
 		previousMousePoint = Point(-1, -1);
@@ -156,14 +156,23 @@ bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint)
 		(
 			0 <= nowPoint.x && nowPoint.x < FIELD_WIDTH &&
 			0 <= nowPoint.y && nowPoint.y < FIELD_HEIGHT
-			)
+		)
 	)
 	{
-		Color paintColor = (mouse == MouseL) ? PALETTE[1] : PALETTE[0];
+		Color paintColor;
+		if ((mouse == MouseL) ^ isReverse)
+		{
+			paintColor = PALETTE[1];
+		}
+		else
+		{
+			paintColor = PALETTE[0];
+		}
+
 		if (0 <= nowPoint.x && nowPoint.x < FIELD_WIDTH && 0 <= nowPoint.y && nowPoint.y < FIELD_HEIGHT)
 		{
 			this->UpdateDot(nowPoint, paintColor);
-			pictureGrid[nowPoint] = mouse == MouseL;
+			pictureGrid[nowPoint] = (mouse == MouseL) ^ isReverse;
 			returnFlag = true;
 		}
 	}
@@ -172,7 +181,7 @@ bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint)
 		(
 			0 <= nowPoint.x && nowPoint.x < FIELD_WIDTH &&
 			0 <= nowPoint.y && nowPoint.y < FIELD_HEIGHT
-			)
+		)
 	)
 	{
 		if ((
@@ -186,14 +195,22 @@ bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint)
 					previousMousePoint,
 					nowPoint
 				);
-				Color paintColor = (mouse == MouseL) ? PALETTE[1] : PALETTE[0];
+				Color paintColor;
+				if ((mouse == MouseL) ^ isReverse)
+				{
+					paintColor = PALETTE[1];
+				}
+				else
+				{
+					paintColor = PALETTE[0];
+				}
 				for (Point cellPoint : draw)
 				{
 					if (0 <= cellPoint.x && cellPoint.x < FIELD_WIDTH && 0 <= cellPoint.y && cellPoint.y < FIELD_HEIGHT)
 					{
 
 						this->UpdateDot(cellPoint, paintColor);
-						pictureGrid[cellPoint] = mouse == MouseL;
+						pictureGrid[cellPoint] = (mouse == MouseL) ^ isReverse;
 					}
 				}
 
@@ -255,6 +272,20 @@ bool PictureMaze::SaveAsOriginFile()
 		return result == MessageBoxResult::OK;
 	}
 
+	return false;
+}
+
+bool PictureMaze::MouseReverse(bool isReverseMouse)
+{
+	if (SimpleGUI::Button(U"{}"_fmt(!isReverseMouse ? U"Pen" : U"Eraser"),
+		Vec2{
+			FIELD_OFFSET_LEFT + CELL_SIZE * FIELD_WIDTH * CELL_CNT + BUTTON_LEFT_PADDING,
+			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 2
+		},
+		120))
+	{
+		return true;
+	}
 	return false;
 }
 

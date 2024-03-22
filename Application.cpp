@@ -4,6 +4,7 @@ Application::Application()
 {
 	this->applicationMode = AppMode::Paint;
 	this->_init = true;
+	this->_mouseReverse = false;
 }
 
 AppMode Application::mode()
@@ -30,6 +31,7 @@ void Application::ModeChange()
 		break;
 	case AppMode::Maze:
 		applicationMode = AppMode::Paint;
+		this->_mouseReverse = false;
 		break;
 	default:
 		break;
@@ -43,4 +45,13 @@ bool Application::init() {
 void Application::InitBreak()
 {
 	_init = false;
+}
+
+void Application::MouseReverse()
+{
+	this->_mouseReverse = !this->_mouseReverse;
+}
+bool Application::isReverse()
+{
+	return this->_mouseReverse;
 }
