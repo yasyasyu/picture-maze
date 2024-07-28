@@ -1,6 +1,6 @@
 ﻿# include "MazeUtility.hpp"
 
-namespace MazeUtillity {
+namespace MazeUtility {
 	/**
 	 * @fn gridのTrueの部分が連結かを判定する。
 	 * @brief 連結グラフ判定
@@ -657,5 +657,33 @@ namespace MazeUtillity {
 		}
 		route.reverse();
 		return route;
+	}
+
+	int GetSizeFromIniFile(String key) {
+		const INI ini{ U"./app.ini" };
+		if (not ini) {
+			throw Error{ U"Failed to load `config.ini`" };
+		}
+		 /*
+		for (const auto& section : ini.sections())
+		{
+			Print << U"[{}]"_fmt(section.section);
+			for (const auto& key : section.keys)
+			{
+				Print << U"{} = {}"_fmt(key.name, key.value);
+			}
+		}
+		*/
+
+		return Parse<int>(ini[key]);
+	}
+
+	int GetFieldHeight() {
+		int fieldHeight = GetSizeFromIniFile(U"FieldSize.Height");
+		return fieldHeight;
+	}
+	int GetFieldWidth() {
+		int fieldWidth = GetSizeFromIniFile(U"FieldSize.Width");
+		return fieldWidth;
 	}
 }

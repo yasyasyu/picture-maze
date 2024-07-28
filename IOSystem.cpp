@@ -359,6 +359,7 @@ void OutputSystem::FileOutPut(PictureMaze& pictureMaze, bool isOrigin)
 			return;
 		}
 		saveFolder = FileSystem::ParentPath(filePath.value());
+		this->parentFolder = saveFolder;
 		fileName = FileSystem::BaseName(filePath.value());
 
 	}

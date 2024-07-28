@@ -6,7 +6,7 @@
 
 void Main()
 {
-	PictureMaze pictureMaze;
+	PictureMaze pictureMaze = PictureMaze();
 	Application application = Application();
 	// Window Size
 	Window::Resize(pictureMaze.WindowSize());
@@ -72,7 +72,7 @@ void Main()
 				if (!pictureMaze.isExistMaze)
 				{
 					auto [ansSpanningTree, spanningTree, start, goal, ngBorder]
-						= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid);
+						= MazeUtility::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid);
 					pictureMaze.SetSpanningTree(ansSpanningTree, spanningTree);
 					pictureMaze.SetStartGoal(start, goal);
 					pictureMaze.SetNgBorder(ngBorder);
@@ -86,7 +86,7 @@ void Main()
 			if (pictureMaze.ReMaze())
 			{
 				auto [ansSpanningTree, spanningTree, start, goal, ngBorder]
-					= MazeUtillity::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid);
+					= MazeUtility::CreateMaze(pictureMaze.pictureGrid, pictureMaze.mazeGrid);
 				pictureMaze.SetSpanningTree(ansSpanningTree, spanningTree);
 				pictureMaze.SetStartGoal(start, goal);
 				pictureMaze.SetNgBorder(ngBorder);
