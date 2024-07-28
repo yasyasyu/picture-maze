@@ -1,5 +1,14 @@
 ﻿# include "PictureMaze.hpp"
+PictureMaze::PictureMaze() {
+	FIELD_HEIGHT = MazeUtility::GetFieldHeight();
+	FIELD_WIDTH = MazeUtility::GetFieldWidth();
 
+	pictureImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
+	mazeImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
+
+	pictureGrid = Grid<bool>(FIELD_WIDTH, FIELD_HEIGHT, false);
+	mazeGrid = Grid<int>(FIELD_WIDTH * 2, FIELD_HEIGHT * 2, 0);
+}
 void PictureMaze::SetRoute(const Array<Point>& route)
 {
 	isRoute = true;
@@ -108,7 +117,7 @@ void PictureMaze::SolveMaze()
 			FIELD_OFFSET_UP + (BUTTON_HEIGHT + BUTTON_PADDING) * 2
 		}, 120))
 	{
-		Array<Point>route = MazeUtillity::Solve(mazeGrid, start, goal);
+		Array<Point>route = MazeUtility::Solve(mazeGrid, start, goal);
 		SetRoute(route);
 	}
 }
@@ -191,7 +200,7 @@ bool PictureMaze::DrawDot(const Input& mouse, Point& previousMousePoint, bool is
 		)
 			if (nowPoint != previousMousePoint)
 			{
-				HashSet<Point> draw = MazeUtillity::Bresenham(
+				HashSet<Point> draw = MazeUtility::Bresenham(
 					previousMousePoint,
 					nowPoint
 				);
@@ -646,7 +655,7 @@ bool PictureMaze::ChangeMazeMode()
 		}, 120)
 	)
 	{
-		if (!MazeUtillity::isConnectedGraph(pictureGrid))
+		if (!MazeUtility::isConnectedGraph(pictureGrid))
 		{
 			System::MessageBoxOK(U"UnConnectedError", U"絵が全て繋がっていません。", MessageBoxStyle::Warning);
 			return false;

@@ -10,9 +10,6 @@ private:
 	int CELL_CNT = 8;
 	int HARF_CELL_CNT = CELL_CNT / 2 + CELL_CNT % 2;
 
-	int FIELD_HEIGHT = 20;
-	int FIELD_WIDTH = 20;
-
 	int FIELD_OFFSET_LEFT = 8;
 	int FIELD_OFFSET_UP = 8;
 
@@ -50,11 +47,14 @@ private:
 	Rect parentFolderRect;
 
 public:
-	Image pictureImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
-	Image mazeImage = Image(CELL_CNT * FIELD_WIDTH, CELL_CNT * FIELD_HEIGHT, Palette::White);
+	PictureMaze();
+	// Get FieldSize from IniFile
+	int FIELD_HEIGHT, FIELD_WIDTH;
 
-	Grid<bool> pictureGrid = Grid<bool>(FIELD_WIDTH, FIELD_HEIGHT, false);
-	Grid<int> mazeGrid = Grid<int>(FIELD_WIDTH * 2, FIELD_HEIGHT * 2, 0);
+	Image pictureImage, mazeImage;
+
+	Grid<bool> pictureGrid;
+	Grid<int> mazeGrid;
 
 	Point WindowSize() const;
 

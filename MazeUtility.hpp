@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-namespace MazeUtillity {
+namespace MazeUtility {
 	/**
 	 * @fn gridのTrueの部分が連結かを判定する。
 	 * @brief 連結グラフ判定
@@ -47,4 +47,8 @@ namespace MazeUtillity {
 		CreateMaze(const Grid<bool>& pictureGrid, Grid<int>& mazeGrid);
 
 	Array<Point> Solve(Grid<int>& mazeGrid, Point start, Point goal);
+
+
+	int GetFieldHeight();
+	int GetFieldWidth();
 }
